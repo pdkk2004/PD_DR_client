@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<TextView android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="Welcome, Guest!"
+		android:textSize="15sp" />
+	<ImageView android:id="@+id/ImageView01"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:src="@drawable/logo" android:layout_marginBottom="10dip"
+		android:layout_marginTop="10dip" />
+	
+	<TableLayout android:id="@+id/TableLayout01"
+		android:layout_height="wrap_content" android:stretchColumns="1"
+		android:layout_width="fill_parent">
+		<TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:paddingTop="5dip">
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="User Name:"
+				android:paddingLeft="20dip" android:paddingRight="20dip"
+				android:textStyle="bold" android:textSize="20sp" />
+			<EditText android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="20dip"
+				android:id="@+id/usr_name" android:maxLines="1" android:inputType="text"/>
+		</TableRow>
+		<TableRow android:id="@+id/TableRow02" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:paddingTop="15dip">
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:paddingLeft="20dip"
+				android:paddingRight="20dip" android:textStyle="bold"
+				android:textSize="20sp" android:text="Pass Word:" />
+			<EditText android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="20dip"
+				android:id="@+id/pass_word" android:inputType="textPassword" android:minLines="1"/>
+		</TableRow>
+	</TableLayout>
+	<TextView android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:paddingBottom="10dip"
+		android:paddingTop="10dip" android:clickable="true"
+		android:paddingLeft="60dip" android:text="@string/go_register"
+		android:textColor="@drawable/yellow" android:id="@+id/tvRegistry" /><RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content">
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnCancel" android:text="Cancel" android:layout_marginRight="20dip" android:paddingLeft="15dip" android:paddingRight="15dip" />
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnSubmit" android:text="OK" android:layout_toLeftOf="@+id/btnCancel" android:paddingLeft="25dip" android:paddingRight="25dip" android:layout_marginRight="5dip" />
+	</RelativeLayout>
+	
+
+</LinearLayout>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/LinearLayout01"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<TableLayout android:id="@+id/TableLayout01"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:stretchColumns="1">
+		<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textSize="18sp"
+			android:padding="5dip" android:textColor="@drawable/yellow"
+			android:text="To registry your account, please input the registration code givn by your physician and create your own pass word: "
+			android:textStyle="bold"></TextView>
+		<ImageView android:layout_width="wrap_content"
+			android:layout_height="wrap_content"></ImageView>
+		<TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginTop="5dip"
+			android:layout_marginBottom="0dip" android:paddingBottom="0sp">
+			<TextView android:id="@+id/TextView02"
+				android:layout_height="wrap_content" android:layout_width="fill_parent"
+				android:textSize="20sp" android:textStyle="bold"
+				android:paddingRight="5dip" android:paddingLeft="5dip" android:text="*Reg Code:"></TextView>
+			<EditText android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="15dip" android:id="@+id/editCode" android:minLines="1" android:inputType="number"></EditText>
+		</TableRow>
+		<TableRow android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/TableRow05">
+			<TextView android:layout_height="wrap_content"
+				android:layout_width="fill_parent" android:paddingLeft="15dip"
+				android:paddingRight="5dip" android:text="               "
+				android:id="@+id/TextView07"></TextView>
+			<TextView android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginTop="0dip"
+				android:textSize="12sp" android:id="@+id/TextView09"
+				android:layout_marginBottom="5dip" android:text="(Code given by clinics)"></TextView>
+		</TableRow>
+		<TableRow android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginTop="5dip"
+			android:layout_marginBottom="5dip" android:id="@+id/TableRow02">
+			<TextView android:layout_height="wrap_content"
+				android:layout_width="fill_parent" android:textSize="20sp"
+				android:textStyle="bold" android:paddingRight="5dip" android:id="@+id/TextView03"
+				android:paddingLeft="5dip" android:text="*Pass word:"></TextView>
+			<EditText android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="15dip" android:id="@+id/editPw" android:maxLines="1" android:inputType="textPassword"></EditText>
+		</TableRow>
+		<TableRow android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginBottom="5dip"
+			android:layout_marginTop="5dip" android:id="@+id/TableRow03">
+			<TextView android:layout_height="wrap_content"
+				android:layout_width="fill_parent" android:textSize="20sp"
+				android:textStyle="bold" android:id="@+id/TextView04" android:text="*Repeat PW:"
+				android:paddingLeft="5dip" android:paddingRight="5dip"></TextView>
+			<EditText android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="15dip" android:id="@+id/editPw2" android:maxLines="1" android:inputType="textPassword"></EditText>
+		</TableRow>
+		<RelativeLayout android:id="@+id/RelativeLayout01"
+			android:layout_width="wrap_content" android:layout_height="wrap_content">
+			<Button android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true" android:id="@+id/btnCancel"
+				android:text="Cancel" android:paddingLeft="15dip"
+				android:paddingRight="15dip" android:layout_marginRight="15dip"
+				android:onClick="cancel"></Button>
+			<Button android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginRight="5dip" android:layout_toLeftOf="@+id/btnCancel"
+				android:paddingLeft="15dip" android:paddingRight="15dip"
+				android:text="Submit" android:id="@+id/btnSubmit"
+				android:onClick="submit"></Button>
+		</RelativeLayout>
+	</TableLayout>
+</LinearLayout>

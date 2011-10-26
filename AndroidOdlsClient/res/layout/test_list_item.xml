@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+	<LinearLayout android:id="@+id/linearLayout1"
+		android:layout_width="match_parent" android:layout_height="wrap_content">
+		<ImageView android:src="@drawable/alert_dialog_icon" android:id="@+id/imageView1"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView>
+		<TableLayout android:id="@+id/tableLayout1"
+			android:layout_width="wrap_content" android:layout_height="match_parent">
+			<TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="TextView"
+					android:layout_marginLeft="10sp" android:layout_marginRight="10sp"
+					android:id="@+id/textView_type" android:textAppearance="?android:attr/textAppearanceSmall"
+					android:textStyle="bold"></TextView>
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:id="@+id/textView2"
+					android:text="Score:" android:layout_marginRight="5sp"
+					android:textStyle="bold" android:textAppearance="?android:attr/textAppearanceSmall"></TextView>
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="TextView"
+					android:id="@+id/textView_value" android:textColor="@drawable/red"
+					android:textAppearance="?android:attr/textAppearanceSmall"></TextView>
+			</TableRow>
+			<TableRow android:id="@+id/tableRow2" android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				<TextView android:layout_marginRight="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10sp" android:text="TextView" android:id="@+id/textView_date" android:textAppearance="?android:attr/textAppearanceSmall"></TextView>
+			</TableRow>
+		</TableLayout>
+	</LinearLayout>
+</LinearLayout>

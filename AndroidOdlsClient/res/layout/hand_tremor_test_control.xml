@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout android:id="@+id/hand_test_control_layout"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="match_parent"
+	android:stretchColumns="3" android:layout_height="wrap_content">
+	<TableRow android:id="@+id/tableRow1" android:layout_height="wrap_content" android:layout_width="match_parent">
+		<ProgressBar android:id="@+id/progressBar1"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="5sp"></ProgressBar>
+		<TextView android:layout_width="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_height="wrap_content" android:id="@+id/textView_elapsedTime"
+			android:gravity="center_vertical" android:text="0"
+			android:layout_gravity="center_vertical"></TextView>
+		<TextView android:layout_width="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_height="wrap_content" android:id="@+id/textView_label"
+			android:text="s" android:layout_gravity="center_vertical">
+		</TextView>
+		<Button android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/btn_control"
+			android:layout_marginRight="5sp" android:layout_marginTop="5sp"
+			android:text="Start" android:textSize="20sp" android:textStyle="bold"
+			android:typeface="normal" android:textColor="@drawable/red"
+			android:layout_marginBottom="5sp" android:layout_marginLeft="10sp">
+		</Button>
+	</TableRow>
+</TableLayout>

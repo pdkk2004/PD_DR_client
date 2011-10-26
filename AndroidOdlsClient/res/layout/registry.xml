@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/ScrollView01" android:layout_width="fill_parent"
+	android:layout_height="wrap_content">
+	<LinearLayout android:id="@+id/LinearLayout01"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TableLayout android:id="@+id/TableLayout01"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:stretchColumns="1">
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:textSize="18sp"
+				android:padding="5dip" android:textColor="@drawable/yellow"
+				android:text="Please provide the following information to complete registry: "></TextView>
+			<TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginTop="5dip"
+				android:layout_marginBottom="5dip">
+				<TextView android:id="@+id/TextView02"
+					android:layout_height="wrap_content" android:layout_width="fill_parent"
+					android:textSize="20sp" android:textStyle="bold"
+					android:paddingRight="5dip" android:text="*Last Name:"
+					android:paddingLeft="5dip"></TextView>
+				<EditText android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginRight="15dip"
+					android:id="@+id/last_name"></EditText>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginTop="5dip"
+				android:layout_marginBottom="5dip" android:id="@+id/TableRow02">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:textSize="20sp"
+					android:textStyle="bold" android:paddingRight="5dip" android:id="@+id/TextView03"
+					android:paddingLeft="5dip" android:text="*First Name:"></TextView>
+				<EditText android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginRight="15dip"
+					android:id="@+id/first_name"></EditText>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginBottom="5dip"
+				android:layout_marginTop="5dip" android:id="@+id/TableRow03">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:paddingLeft="15dip"
+					android:paddingRight="15dip" android:textSize="20sp"
+					android:textStyle="bold" android:id="@+id/TextView04" android:text="MI:"></TextView>
+				<EditText android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginRight="15dip"
+					android:id="@+id/middle_name"></EditText>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginTop="5dip"
+				android:id="@+id/TableRow04">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:textSize="20sp"
+					android:textStyle="bold" android:paddingRight="5dip" android:id="@+id/TextView05"
+					android:text="*DOB:" android:paddingLeft="5dip"></TextView>
+				<EditText android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginRight="15dip"
+					android:id="@+id/dob"></EditText>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:id="@+id/TableRow05">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:paddingLeft="15dip"
+					android:paddingRight="5dip" android:text="               "
+					android:id="@+id/TextView07"></TextView>
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:text="(mm/dd/yyyy)"
+					android:layout_marginTop="0dip" android:layout_marginBottom="5dip"
+					android:textSize="12sp" android:id="@+id/TextView07"></TextView>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_marginTop="5dip"
+				android:id="@+id/TableRow06">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:paddingLeft="15dip"
+					android:textSize="20sp" android:textStyle="bold"
+					android:paddingRight="5dip" android:text="Phone:" android:id="@+id/TextView08"></TextView>
+				<EditText android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginRight="15dip"
+					android:id="@+id/pass_word"></EditText>
+			</TableRow>
+			<TableRow android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:id="@+id/TableRow07">
+				<TextView android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:paddingLeft="15dip"
+					android:paddingRight="5dip" android:id="@+id/TextView05"
+					android:text="               "></TextView>
+				<TextView android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginTop="0dip"
+					android:layout_marginBottom="5dip" android:textSize="12sp"
+					android:text="(132-456-7890)" android:id="@+id/TextView09"></TextView>
+			</TableRow>
+			<RelativeLayout android:id="@+id/RelativeLayout01"
+				android:layout_width="wrap_content" android:layout_height="wrap_content">
+				<Button android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true" android:id="@+id/btnCancel"
+					android:text="Cancel" android:paddingLeft="15dip"
+					android:paddingRight="15dip" android:layout_marginRight="15dip"></Button>
+				<Button android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:id="@+id/btnSubmit"
+					android:layout_marginRight="5dip" android:layout_toLeftOf="@+id/btnCancel"
+					android:paddingLeft="15dip" android:paddingRight="15dip"
+					android:text="Submit"></Button>
+			</RelativeLayout>
+		</TableLayout>
+	</LinearLayout>
+</ScrollView>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/ScrollView01" android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<LinearLayout android:id="@+id/LinearLayout01" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical">
+		<TextView android:id="@+id/TextView01" android:layout_width="fill_parent" android:layout_height="wrap_content" android:textSize="18sp" android:textColor="@drawable/yellow" android:padding="5dip" android:text="How confident are you that you do the following activities without falling?"></TextView><TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:padding="5dip" android:id="@+id/TextView12" android:textSize="16sp" android:text="* On a scale from 1(very confident) 10(not confident at all)." android:textColor="@drawable/red"></TextView>
+		<TextView android:id="@+id/TextView02" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:text="1. Take a bath or shower"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_1"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/TextView03" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:text="2. Reach into cabinets or closets"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_2"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView04" android:text="3. Walk around the house"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_3"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView05" android:text="4. Prepare meals not requiring carrying heavy or hot objects"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_4"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView06" android:text="5. Get in and out of bed"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_5"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView07" android:text="6. Answer the door or telephone"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_6"></Spinner>
+		<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView08" android:text="7. Get in and out of a chair"></TextView>
+		<Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_7"></Spinner><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView09" android:text="8. Getting dressed and undressed"></TextView><Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_8"></Spinner><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView10" android:text="9. Personal grooming(i.e. washing your face)"></TextView><Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_9"></Spinner><TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="5dip" android:textSize="16sp" android:textStyle="bold" android:id="@+id/TextView11" android:text="10. Getting on and off of the toilet"></TextView><Spinner android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dip" android:id="@+id/falls_10"></Spinner><RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:id="@+id/btnCancel" android:text="Cancel" android:layout_marginRight="20dip" android:paddingLeft="15dip" android:paddingRight="15dip"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnSubmit" android:text="OK" android:layout_toLeftOf="@+id/btnCancel" android:paddingLeft="25dip" android:paddingRight="25dip" android:layout_marginRight="5dip"></Button></RelativeLayout>
+		
+
+
+
+</LinearLayout>
+
+
+
+
+
+
+</ScrollView>
