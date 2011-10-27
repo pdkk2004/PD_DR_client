@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 
 public class SupportingUtils {
 	
+	public static int bytesPerPoint = Float.SIZE / Byte.SIZE;
+	
 	//Check whether the network is available
 	public static boolean isNetworkAvailable(Context context) {
 	    ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);

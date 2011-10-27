@@ -46,6 +46,6 @@ public class MainControlActivity extends TabActivity {
 	    tabHost.addTab(spec);
 	    
 	    tabHost.setCurrentTab(0);
-		
+	
 	}
 }

@@ -24,11 +24,13 @@ import android.widget.TextView;
 import com.dp.odls.model.Test;
 import com.dp.odls.model.User;
 import com.dp.odls.sqlite.OdlsDbAdapter;
+import com.dp.odls.util.SupportingUtils;
 import com.pd.odls.R;
 import com.pd.odls.test.BaseTestActivity;
 
 import java.io.*;
 import java.lang.Thread.State;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,7 +45,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	private TextView elapsedTimeView;
 	private int elapsedTime;
 	private Timer timer;
-	private ByteArrayOutputStream buffer = new ByteArrayOutputStream(3 * 4 * 5 * 20);  //create the buffer to store 20 s test data at 5Hz
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
+	private DataOutputStream dout;
 	private OdlsDbAdapter databaseManager;
 
 	//Create the timer task to count test elapsed time
@@ -142,6 +145,10 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		
 		//prepare database manager to save test data
 		databaseManager = new OdlsDbAdapter(this);
+		databaseManager.open();
+		
+		//initialize DataOutputStream to store sensed data
+		this.dout = new DataOutputStream(buffer);
 	}
 	
 	@Override
@@ -168,11 +175,13 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	
 	@Override
 	protected void initializeTest() {
+		//Reset buffer to empty
+		buffer.reset();
 		//initialize test thread
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
 			testThread = new HandTremorTestThread(testPanel, 
 					testPanel.getHolder(), 
-					buffer,
+					dout,
 					this, 
 					handler);	
 		}
@@ -240,7 +249,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			return dialog;
 		case DLG_DATABASE_ERROR:
 			builder.setTitle("Error:")
-					.setMessage("Fail to open database on device.\n You cannot save test result on device!")
+					.setMessage("Fail to access database. The test result has not been saved.\n" +
+							"Please try again or check your device database setting!")
 					.setCancelable(false)
 					.setPositiveButton("OK", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -250,7 +260,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			dialog = builder.create();
 			return dialog;
 		case DLG_TEST_DONE:
-			builder.setMessage("This test has already achieved the time limit.\nDo you want to save or discard this test result?")
+			builder.setMessage("Test completed.\nDo you want to save or discard this test result?")
 					.setCancelable(false)
 					.setPositiveButton("Save", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -282,33 +292,32 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			}
 		}
 		
-		databaseManager.createTest(PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
-				10, Test.TEST_HAND_TREMOR_LEFT,
-				(long)100000,
-				(long)101000,
-				(long)102000,
-				1000,
-				"Test record",
-				5,
-				2,
-				buffer.toByteArray());
-		return true;
-		//Test database insert string
-//		String sqlString = "INSERT INTO " + OdlsDbAdapter.DATABASE_TABLE + " VALUES " +
-//		"('pdkk2004'," //FIELD_TESTER_ID
-//		+ " 10, "	//FIELD_TEST_ID
-//		+ Test.TEST_HAND_TREMOR_LEFT 	//FIELD_TYPE
-//		+ ", "	//FIELD_DATE
-//		+ 100000 + ", " 	//FIELD_BEGIN_TIME
-//		+ 101000 + ", "		//FIELD_END_TIME
-//		+ 1000 + ", "		//FIELD_DURATION
-//		+ "'Test record'" + ", "	//FIELD_EXPLANATION
-//		+ 5 + ", "		//FIELD_SAMPLE_RATE
-//		+ "2" + ", "
-//		+ ");";	//FIELD_SCALE
-
-	
+		System.out.println(buffer.toString());
 		
+		byte[] data = buffer.toByteArray();
+		System.out.println(Arrays.toString(data));
+		byte[] test = {1, 2, 3, 4, 5};
+		System.out.println(Arrays.toString(test));
 
+		int samplePoints = data.length / SupportingUtils.bytesPerPoint;
+		int testDuration = (int)(endTime - beginTime);
+		int sampleRate = (int)(1000 * samplePoints / testDuration);
+		
+		databaseManager.createTest(PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
+				null, Test.TEST_HAND_TREMOR_LEFT,
+				beginTime,
+				beginTime,
+				endTime,
+				testDuration,
+				"Test record",
+				sampleRate,
+				null,
+				test);
+		
+		//clear buffer for next use
+		buffer.reset();
+		return true;
 	}
+	
+	
 }

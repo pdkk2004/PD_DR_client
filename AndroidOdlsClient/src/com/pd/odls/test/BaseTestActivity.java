@@ -1,5 +1,7 @@
 package com.pd.odls.test;
 
+import java.util.Date;
+
 import android.app.Activity;
 
 
@@ -11,7 +13,8 @@ public abstract class BaseTestActivity extends Activity {
 	protected boolean isRunning;
 	protected boolean pause;
 	protected BaseTestThread testThread;
-	
+	protected long beginTime = 0;
+	protected long endTime = 0;
 
 	
 	protected void beginTest() {
@@ -20,7 +23,7 @@ public abstract class BaseTestActivity extends Activity {
 			testThread.setRunning(this.isRunning);
 			testThread.start();
 		}
-
+		beginTime = System.currentTimeMillis();
 	}
 	
 	protected void pauseOrResume() {
@@ -45,7 +48,8 @@ public abstract class BaseTestActivity extends Activity {
 			if(testThread != null) {
 					testThread.setRunning(isRunning);
 			}
-		}		
+		}
+		endTime = System.currentTimeMillis();
 	}
 	
 	/**

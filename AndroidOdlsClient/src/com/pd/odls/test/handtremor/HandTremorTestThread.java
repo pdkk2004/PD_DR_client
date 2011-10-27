@@ -1,6 +1,5 @@
 package com.pd.odls.test.handtremor;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -27,21 +26,17 @@ public class HandTremorTestThread extends BaseTestThread {
 //	private Accelerometer accelerometer;
 	private SimulatedAccelerometer accelerometer;
 	
-	private ByteArrayOutputStream buffer;
-	private int bufferIndex;
 	private DataOutputStream dout;
 	private Handler handler;
 
 	
 	public HandTremorTestThread(BaseTestPanel testPanel,
-			SurfaceHolder surfaceHolder, ByteArrayOutputStream buffer, Context context, Handler handler) {
+			SurfaceHolder surfaceHolder, DataOutputStream dout, Context context, Handler handler) {
 		super(testPanel, surfaceHolder);
 		this.offSetX = 0;
 		this.offSetY = 0;
 		this.context = context;
-		this.buffer = buffer;
-		this.bufferIndex = 0;
-		dout = new DataOutputStream(buffer);
+		this.dout = dout;
 		this.handler = handler;
 	}
 	
@@ -73,7 +68,7 @@ public class HandTremorTestThread extends BaseTestThread {
 				Log.e(this.getClass().getName(), e.getMessage());
 			}
 			
-			if(dout.size() >= 3 * 4 * 5 * 20)
+			if(dout.size() >= 3 * 4 * 5 * 1000)
 				handler.sendEmptyMessage(HandTremorTestActivity.MSG_BUFFER_FULL);				
 		}
 

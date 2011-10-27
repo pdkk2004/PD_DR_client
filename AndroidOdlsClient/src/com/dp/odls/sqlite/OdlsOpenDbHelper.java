@@ -15,7 +15,7 @@ public class OdlsOpenDbHelper extends SQLiteOpenHelper  {
 
 	private static final String CREATE_TEST_TABLE = "CREATE TABLE IF NOT EXISTS tests" +
 			" (tester_id text not null, "
-			+ "test_id integer not null,"
+			+ "_id INTEGER PRIMARY KEY ASC,"
 			+ "type integer,"
 			+ "date integer,"
 			+ "begin_time integer,"
@@ -24,13 +24,13 @@ public class OdlsOpenDbHelper extends SQLiteOpenHelper  {
 			+ "explanation text,"
 			+ "sample_rate integer,"
 			+ "scale integer,"
-			+ "data blob,"
-			+ "primary key(tester_id, test_id));";
+			+ "data blob);";
 	
-	private static final String CREATE_PATIENT_TABLE = "CREATE TABLE IF NOT EXISTS patients" +
-			"(tester_id text primary key not null, "
-			+ "password text not null"
-			+ ");";
+	//TODO: Uncomment this table create command if Patients table needed.
+//	private static final String CREATE_PATIENT_TABLE = "CREATE TABLE IF NOT EXISTS patients" +
+//			"(tester_id text primary key not null, "
+//			+ "password text not null"
+//			+ ");";
 		
 	public OdlsOpenDbHelper(Context context, String name, CursorFactory factory,
 			int version) {

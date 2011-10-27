@@ -10,7 +10,7 @@ import android.util.Log;
 public class OdlsDbAdapter {
 	// Database fields
 	public static final String FIELD_TESTER_ID = "tester_id";
-	public static final String FIELD_TEST_ID = "test_id";
+	public static final String FIELD_TEST_ID = "_id";
 	public static final String FIELD_TYPE = "type";
 	public static final String FIELD_DATE = "date";
 	public static final String FIELD_BEGIN_TIME = "begin_time";

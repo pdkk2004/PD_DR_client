@@ -25,22 +25,53 @@ import com.pd.odls.R;
 public class TestHistoryListActivity extends Activity {
 	
 	private ArrayList<Test> listContent;
-	private OdlsDbAdapter databaseAdapter;
-	private ListView lv;
+	private OdlsDbAdapter databaseManager;
+	private ListView testsListView;
 	private EditText search;
 	
+
+	@Override
+	protected void onResume() {
+		this.retrieveTests();
+		super.onResume();
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tests_history);
-		lv = (ListView)findViewById(R.id.list_test);
+		testsListView = (ListView)findViewById(R.id.list_test);
 		search = (EditText)findViewById(R.id.edit_search);
-		
-	    //Prepare database
-	    databaseAdapter = new OdlsDbAdapter(this);
-	    databaseAdapter.open();
 	    
-	    //Get userName from SharedPreference
+	    //Prepare database
+	    databaseManager = new OdlsDbAdapter(this);
+		databaseManager.open();
+		
+		//Add onChange listener to search field
+		search.addTextChangedListener(new TextWatcher() {
+
+			public void afterTextChanged(Editable s) {
+				//TODO response to search text change
+			}
+
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// do nothing
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				// do nothing
+			}
+			
+		});
+	}
+
+	/**
+	 * Retrieve tests from database
+	 */
+	private void retrieveTests() {		
+		//Get userName from SharedPreference
 	    SharedPreferences userPreference = PreferenceManager.getDefaultSharedPreferences(this);
 	    String userName = userPreference.getString(User.USER_NAME, "n/a");
 	    
@@ -63,10 +94,23 @@ public class TestHistoryListActivity extends Activity {
 	    	+ OdlsDbAdapter.FIELD_BEGIN_TIME + " DESC "
 	    	+ " LIMIT 20;";
 	    
+	    //TODO: Test purpose, should be deleted in production release
+//	    String sqltest = "SELECT data from " + OdlsDbAdapter.DATABASE_TABLE + ";";
+//	    Cursor c = databaseAdapter.fetchTest(sqltest);
+//	    c.moveToFirst();
+//	    while(!c.isAfterLast()) {
+//	    	int index = c.getColumnIndex(OdlsDbAdapter.FIELD_DATA);
+//	    	byte[] data = c.getBlob(index);
+//	    	System.out.println("retrieved:" + Arrays.toString(data));
+//	    	c.moveToNext();
+//	    }
+	    
+	    
 	    //Get query result cursor
-	    Cursor cursor = databaseAdapter.fetchTest(sql);
+	    Cursor cursor = databaseManager.fetchTest(sql);
 	    //Fill the test list content from query result
 		listContent = fillTestArray(cursor);
+		cursor.close();
 		
 		//Prepare the ListView Adapter
 		String[] from = new String[]{"textView_type", "textView_value", "textView_date"};
@@ -76,26 +120,7 @@ public class TestHistoryListActivity extends Activity {
 		
 		ListAdapter adapter = new SimpleAdapter(this, fillMap, 
 				R.layout.test_list_item, from, to);
-		lv.setAdapter(adapter);
-		
-		//Add onChange listener to search field
-		search.addTextChangedListener(new TextWatcher() {
-
-			public void afterTextChanged(Editable s) {
-				//TODO response to search text change
-			}
-
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// do nothing
-			}
-
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				// do nothing
-			}
-			
-		});
+		testsListView.setAdapter(adapter);
 	}
 	
 	/**
@@ -118,27 +143,27 @@ public class TestHistoryListActivity extends Activity {
 		return list;
 	}
 	
-	@Override
-	
+	@Override	
 	public void onDestroy() {
 		listContent = null;
-		databaseAdapter.close();
-		databaseAdapter = null;
+		databaseManager.close();
+		databaseManager = null;
 		super.onDestroy();
 	}
 
 	@Override
 	public void finish() {
-		databaseAdapter.close();
+		databaseManager.close();
 		super.finish();
 	}
 	
+
 	//Prepare List adapter map to be consumed by ListAdapter
 	private List<HashMap<String, String>> fillListMap(ArrayList<? extends Test> testList) {
 		List<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> map = new HashMap<String, String>();
 		
 		for(Test t: testList) {
+			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("textView_type", Test.TEST_TYPES[t.getType()]);
 			map.put("textView_value", t.getScale() == null ? "N/A" : String.valueOf(t.getScale()));
 			
@@ -147,7 +172,7 @@ public class TestHistoryListActivity extends Activity {
 			sdf = new SimpleDateFormat("HH:mm");
 			String time = sdf.format(t.getBeginTime());
 			
-			map.put("textView_date", date + " " + time);
+			map.put("textView_date", date + " @" + time);
 			mapList.add(map);
 		}
 		return mapList;
