@@ -12,14 +12,14 @@
 		<activity android:name=".scale.FallsEvaluationActivityy" />
 		<activity android:name=".main.MainControlActivity" />
 		<activity android:name=".registry.RegistryActivity" />
-		<activity android:name=".test.TestListActivity" />
+		<activity android:name=".testlist.TestListActivity" />
 		<activity android:name=".test.handtremor.HandTremorTestActivity" />
 		<activity android:name=".test.legtremor.LegTremorTestActivity" />
 		<activity android:name=".test.gait.GaitTestActivity" />
 		<activity android:name=".test.tapping.TappingTestActivity" />
 		
 		<activity android:name=".main.Preferences" android:label="Preferences"></activity>
-		<activity android:name=".test.TestHistoryListActivity" />
+		<activity android:name=".testlist.TestHistoryListActivity" />
 	</application>
 	<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 	<uses-permission android:name="android.permission.INTERNET" />

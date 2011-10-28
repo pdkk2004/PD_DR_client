@@ -8,8 +8,8 @@ import android.widget.TabHost;
 
 import com.pd.odls.R;
 import com.pd.odls.scale.FallsEvaluationActivity;
-import com.pd.odls.test.TestHistoryListActivity;
-import com.pd.odls.test.TestListActivity;
+import com.pd.odls.testlist.TestHistoryListActivity;
+import com.pd.odls.testlist.TestListActivity;
 
 public class MainControlActivity extends TabActivity {
 		

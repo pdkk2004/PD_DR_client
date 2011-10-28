@@ -18,20 +18,23 @@ public final class R {
     }
     public static final class drawable {
         public static final int alert_dialog_icon=0x7f020000;
-        public static final int black=0x7f02000d;
-        public static final int blue=0x7f02000a;
-        public static final int darkred=0x7f020008;
-        public static final int green=0x7f02000b;
-        public static final int hand_tremor=0x7f020001;
-        public static final int icon=0x7f020002;
-        public static final int logo=0x7f020003;
-        public static final int red=0x7f020009;
-        public static final int red_point=0x7f020004;
-        public static final int tab_icon_selected=0x7f020005;
-        public static final int tab_icon_selector=0x7f020006;
-        public static final int tab_icon_unselected=0x7f020007;
-        public static final int white=0x7f02000e;
-        public static final int yellow=0x7f02000c;
+        public static final int black=0x7f020010;
+        public static final int blue=0x7f02000d;
+        public static final int darkred=0x7f02000b;
+        public static final int finger_tapping=0x7f020001;
+        public static final int gait_difficulty=0x7f020002;
+        public static final int green=0x7f02000e;
+        public static final int hand_tremor=0x7f020003;
+        public static final int icon=0x7f020004;
+        public static final int leg_tremor=0x7f020005;
+        public static final int logo=0x7f020006;
+        public static final int red=0x7f02000c;
+        public static final int red_point=0x7f020007;
+        public static final int tab_icon_selected=0x7f020008;
+        public static final int tab_icon_selector=0x7f020009;
+        public static final int tab_icon_unselected=0x7f02000a;
+        public static final int white=0x7f020011;
+        public static final int yellow=0x7f02000f;
     }
     public static final class id {
         public static final int ImageView01=0x7f080041;
@@ -100,7 +103,7 @@ public final class R {
         public static final int first_name=0x7f080044;
         public static final int hand_test_control_layout=0x7f08003b;
         public static final int history=0x7f080054;
-        public static final int imageView1=0x7f08004a;
+        public static final int imageView_type=0x7f08004a;
         public static final int last_name=0x7f080043;
         public static final int linearLayout1=0x7f080049;
         public static final int list_test=0x7f080052;

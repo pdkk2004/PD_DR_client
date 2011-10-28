@@ -4,8 +4,8 @@ import java.sql.Date;
 import java.sql.Time;
 
 import android.database.Cursor;
-
 import com.dp.odls.sqlite.OdlsDbAdapter;
+import com.pd.odls.R;
 
 
 /**
@@ -27,6 +27,10 @@ public class Test {
 		"L Leg Tremor", "R Leg Tremor", "L Finger Tapping", "R Finger Tapping",
 		"Gait"};
 	
+	public static int TEST_TYPE_MAP[] = {R.drawable.alert_dialog_icon, R.drawable.hand_tremor,
+		R.drawable.hand_tremor, R.drawable.leg_tremor, R.drawable.leg_tremor, 
+		R.drawable.finger_tapping, R.drawable.finger_tapping, R.drawable.gait_difficulty};
+	
 	//Test information
 	private String testerID;
 	private Integer testID;
@@ -38,7 +42,11 @@ public class Test {
 	private String explaination;
 	private Integer sampleRate;
 	private Integer scale;
-
+	
+	public Test() {
+		super();
+	}
+	
 	public String getTesterID() {
 		return testerID;
 	}
@@ -240,5 +248,9 @@ public class Test {
 	
 	public String[] getTestTypes() {
 		return TEST_TYPES;
+	}
+	
+	public int getTestIcon() {
+		return TEST_TYPE_MAP[this.getType()];
 	}
 }

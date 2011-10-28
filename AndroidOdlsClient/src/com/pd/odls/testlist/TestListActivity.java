@@ -1,4 +1,4 @@
-package com.pd.odls.test;
+package com.pd.odls.testlist;
 
 import com.pd.odls.test.gait.GaitTestActivity;
 import com.pd.odls.test.handtremor.HandTremorTestActivity;

@@ -1,9 +1,6 @@
-package com.pd.odls.test;
+package com.pd.odls.testlist;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -15,7 +12,6 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.dp.odls.model.Test;
 import com.dp.odls.model.User;
@@ -112,14 +108,17 @@ public class TestHistoryListActivity extends Activity {
 		listContent = fillTestArray(cursor);
 		cursor.close();
 		
-		//Prepare the ListView Adapter
-		String[] from = new String[]{"textView_type", "textView_value", "textView_date"};
-		int[] to = new int[] {R.id.textView_type, R.id.textView_value, R.id.textView_date};
+		//Prepare the ListView Adapter using simple list. Have been updated by using
+		//customized TestItemAdaptor
+//		String[] from = new String[]{"imageView_type", "textView_type", "textView_value", "textView_date"};
+//		int[] to = new int[] {R.id.imageView_type, R.id.textView_type, R.id.textView_value, R.id.textView_date};
+//		
+//		List<HashMap<String, String>> fillMap = fillListMap(listContent);
+//		
+//		ListAdapter adapter = new SimpleAdapter(this, fillMap, 
+//				R.layout.test_list_item, from, to);
 		
-		List<HashMap<String, String>> fillMap = fillListMap(listContent);
-		
-		ListAdapter adapter = new SimpleAdapter(this, fillMap, 
-				R.layout.test_list_item, from, to);
+		ListAdapter adapter = new TestItemAdaptor(this, listContent);
 		testsListView.setAdapter(adapter);
 	}
 	
@@ -159,22 +158,23 @@ public class TestHistoryListActivity extends Activity {
 	
 
 	//Prepare List adapter map to be consumed by ListAdapter
-	private List<HashMap<String, String>> fillListMap(ArrayList<? extends Test> testList) {
-		List<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
-		
-		for(Test t: testList) {
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put("textView_type", Test.TEST_TYPES[t.getType()]);
-			map.put("textView_value", t.getScale() == null ? "N/A" : String.valueOf(t.getScale()));
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-			String date = sdf.format(t.getDate());
-			sdf = new SimpleDateFormat("HH:mm");
-			String time = sdf.format(t.getBeginTime());
-			
-			map.put("textView_date", date + " @" + time);
-			mapList.add(map);
-		}
-		return mapList;
-	}
+//	private List<HashMap<String, String>> fillListMap(ArrayList<? extends Test> testList) {
+//		List<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
+//		
+//		for(Test t: testList) {
+//			HashMap<String, String> map = new HashMap<String, String>();
+//			map.put("imageView_type", this.getResources().getDrawable(t.getTestIcon()));
+//			map.put("textView_type", Test.TEST_TYPES[t.getType()]);
+//			map.put("textView_value", t.getScale() == null ? "N/A" : String.valueOf(t.getScale()));
+//			
+//			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+//			String date = sdf.format(t.getDate());
+//			sdf = new SimpleDateFormat("HH:mm");
+//			String time = sdf.format(t.getBeginTime());
+//			
+//			map.put("textView_date", date + " @" + time);
+//			mapList.add(map);
+//		}
+//		return mapList;
+//	}
 }

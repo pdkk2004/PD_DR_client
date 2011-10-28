@@ -1,7 +1,5 @@
 package com.pd.odls.test;
 
-import java.util.Date;
-
 import android.app.Activity;
 
 
