@@ -113,13 +113,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				}
 				else {
 					countDownDlg.dismiss();
-
-					isRunning = true;
-					synchronized (testThread) {
-						testThread.setRunning(isRunning);
-						testThread.start();
-					}
-					beginTime = System.currentTimeMillis();
+					beginTest();
 				}
 				break;
 			}
@@ -170,7 +164,10 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			public void onClick(View arg0) {
 				if(isRunning == false) {
 					initializeTest();
-					beginTest();
+					Timer t = new Timer();
+					countDownDlg = ProgressDialog.show(HandTremorTestActivity.this, "Ready... Test will begin in", 
+							Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
+					t.schedule(countDownTask, 1000, 1000);
 					controlBtn.setText("Stop");		
 				}
 				else {
@@ -214,13 +211,13 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		}
 	}
 	
-	@Override
-	protected void beginTest() {
-		Timer t = new Timer();
-		countDownDlg = ProgressDialog.show(this, "Ready... Test will begin in", 
-				Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
-		t.schedule(countDownTask, 1000, 1000);
-	}
+//	@Override
+//	protected void beginTest() {
+//		Timer t = new Timer();
+//		countDownDlg = ProgressDialog.show(this, "Ready... Test will begin in", 
+//				Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
+//		t.schedule(countDownTask, 1000, 1000);
+//	}
 	
 	@Override
 	protected void initializeTest() {

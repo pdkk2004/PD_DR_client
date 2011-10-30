@@ -156,6 +156,16 @@ public class LoginActivity extends Activity implements Runnable {
     }
     
 	private int verifyAccount() {
+		//TODO: to be deleted in production
+		try {
+			Thread.sleep(1000);
+			return 1;
+		}
+		catch(InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair(User.USER_NAME, usrName));
 		postParameters.add(new BasicNameValuePair(User.USER_PW, usrPw));
@@ -326,7 +336,11 @@ public class LoginActivity extends Activity implements Runnable {
 			imm.showSoftInputFromInputMethod(currentFocus.getWindowToken(), 
 				InputMethodManager.SHOW_FORCED); 
 	}
-
+	
+	
+	/**
+	 * Implementation of Runnable to send request to server to verify login information in worker thread.
+	 */
 	public void run() {
 		handler.sendEmptyMessage(verifyAccount());
 	}
