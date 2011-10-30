@@ -1,16 +1,23 @@
 package com.pd.odls.testlist;
 
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.pd.odls.R;
 import com.pd.odls.test.gait.GaitTestActivity;
 import com.pd.odls.test.handtremor.HandTremorTestActivity;
 import com.pd.odls.test.legtremor.LegTremorTestActivity;
 import com.pd.odls.test.tapping.TappingTestActivity;
-
-import android.app.ListActivity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 public class TestListActivity extends ListActivity {
 
@@ -24,18 +31,17 @@ public class TestListActivity extends ListActivity {
 		String[] testNames = {"Test hand tremor", "Test gait",
 				"Test finger tapping", "Test leg tremor"};
 		
+		int[] testImage = {R.drawable.hand_tremor, R.drawable.gait_difficulty,
+				R.drawable.finger_tapping, R.drawable.leg_tremor};
+		
 		//create the arrayAdapter to display all test names in a ListView
-		this.setListAdapter(new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, testNames));
+		this.setListAdapter(new TestTypeItemAdaptor(this, testNames, testImage));
 	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		clickDelegate(position);
-//		Object selected = this.getListAdapter().getItem(position);
-//		
-//		Toast.makeText(this, selected.toString(), Toast.LENGTH_SHORT).show();
 	}
 	
 	public void clickDelegate(int position) {
@@ -58,5 +64,55 @@ public class TestListActivity extends ListActivity {
 		}
 		
 		this.startActivityForResult(i, REQUEST_TEST);
+	}
+	
+	/**
+	 * Test list adapter to show all available tests. For each test, the test name and test icon is displayed.
+	 * @author Pan
+	 *
+	 */
+	private class TestTypeItemAdaptor extends BaseAdapter{
+
+		private Context context;
+		private String[] text;
+		private int[] images;
+
+		public TestTypeItemAdaptor(Context context, String[] testNames, int[] testImages) {
+			this.context = context;
+			this.text = testNames;
+			this.images = testImages;
+		}
+
+		public int getCount() {
+			return text.length;
+		}
+
+		public Object getItem(int position) {
+			return position;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			if(convertView == null) {
+				LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.test_type_list_item, null);
+			}
+			
+			TextView testType=(TextView)view.findViewById(R.id.textView_text);
+			ImageView testImage=(ImageView)view.findViewById(R.id.imageView_image);
+
+			//bind test date text
+			testType.setText(text[position]);
+
+			//bind test type image
+			Drawable drawable = context.getResources().getDrawable(images[position]);
+			testImage.setImageDrawable(drawable);
+			return view;
+		}
+
 	}
 }

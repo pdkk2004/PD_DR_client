@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.dp.odls.model.Test;
@@ -24,7 +23,7 @@ public class TestHistoryListActivity extends Activity {
 	private OdlsDbAdapter databaseManager;
 	private ListView testsListView;
 	private EditText search;
-	
+	private TestHistoryItemAdapter adapter;
 
 	@Override
 	protected void onResume() {
@@ -47,7 +46,7 @@ public class TestHistoryListActivity extends Activity {
 		search.addTextChangedListener(new TextWatcher() {
 
 			public void afterTextChanged(Editable s) {
-				//TODO response to search text change
+				adapter.getFilter().filter(s); 
 			}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -89,36 +88,15 @@ public class TestHistoryListActivity extends Activity {
 	    	+ " ORDER BY " 
 	    	+ OdlsDbAdapter.FIELD_BEGIN_TIME + " DESC "
 	    	+ " LIMIT 20;";
-	    
-	    //TODO: Test purpose, should be deleted in production release
-//	    String sqltest = "SELECT data from " + OdlsDbAdapter.DATABASE_TABLE + ";";
-//	    Cursor c = databaseAdapter.fetchTest(sqltest);
-//	    c.moveToFirst();
-//	    while(!c.isAfterLast()) {
-//	    	int index = c.getColumnIndex(OdlsDbAdapter.FIELD_DATA);
-//	    	byte[] data = c.getBlob(index);
-//	    	System.out.println("retrieved:" + Arrays.toString(data));
-//	    	c.moveToNext();
-//	    }
-	    
+	   	    
 	    
 	    //Get query result cursor
 	    Cursor cursor = databaseManager.fetchTest(sql);
 	    //Fill the test list content from query result
 		listContent = fillTestArray(cursor);
 		cursor.close();
-		
-		//Prepare the ListView Adapter using simple list. Have been updated by using
-		//customized TestItemAdaptor
-//		String[] from = new String[]{"imageView_type", "textView_type", "textView_value", "textView_date"};
-//		int[] to = new int[] {R.id.imageView_type, R.id.textView_type, R.id.textView_value, R.id.textView_date};
-//		
-//		List<HashMap<String, String>> fillMap = fillListMap(listContent);
-//		
-//		ListAdapter adapter = new SimpleAdapter(this, fillMap, 
-//				R.layout.test_list_item, from, to);
-		
-		ListAdapter adapter = new TestItemAdaptor(this, listContent);
+			
+		adapter = new TestHistoryItemAdapter(this, R.layout.test_history_list_item, listContent);
 		testsListView.setAdapter(adapter);
 	}
 	

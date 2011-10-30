@@ -89,7 +89,7 @@ public final class R {
         public static final int editCode=0x7f080037;
         public static final int editPw=0x7f080039;
         public static final int editPw2=0x7f08003a;
-        public static final int edit_search=0x7f080051;
+        public static final int edit_search=0x7f080053;
         public static final int falls_1=0x7f08002d;
         public static final int falls_10=0x7f080036;
         public static final int falls_2=0x7f08002e;
@@ -102,14 +102,15 @@ public final class R {
         public static final int falls_9=0x7f080035;
         public static final int first_name=0x7f080044;
         public static final int hand_test_control_layout=0x7f08003b;
-        public static final int history=0x7f080054;
+        public static final int history=0x7f080056;
+        public static final int imageView_image=0x7f080051;
         public static final int imageView_type=0x7f08004a;
         public static final int last_name=0x7f080043;
         public static final int linearLayout1=0x7f080049;
-        public static final int list_test=0x7f080052;
+        public static final int list_test=0x7f080054;
         public static final int middle_name=0x7f080045;
         public static final int pass_word=0x7f08002a;
-        public static final int preferences=0x7f080053;
+        public static final int preferences=0x7f080055;
         public static final int progressBar1=0x7f08003d;
         public static final int tableLayout1=0x7f08004b;
         public static final int tableRow1=0x7f08003c;
@@ -118,6 +119,7 @@ public final class R {
         public static final int textView_date=0x7f080050;
         public static final int textView_elapsedTime=0x7f08003e;
         public static final int textView_label=0x7f08003f;
+        public static final int textView_text=0x7f080052;
         public static final int textView_type=0x7f08004c;
         public static final int textView_value=0x7f08004e;
         public static final int tvRegistry=0x7f080042;
@@ -132,8 +134,9 @@ public final class R {
         public static final int hand_tremor_test_control=0x7f030005;
         public static final int login=0x7f030006;
         public static final int registry=0x7f030007;
-        public static final int test_list_item=0x7f030008;
-        public static final int tests_history=0x7f030009;
+        public static final int test_history_list_item=0x7f030008;
+        public static final int test_type_list_item=0x7f030009;
+        public static final int tests_history=0x7f03000a;
     }
     public static final class menu {
         public static final int menu=0x7f070000;
