@@ -1,7 +1,19 @@
 package com.pd.odls.test.handtremor;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.lang.Thread.State;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.SQLException;
@@ -10,6 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -28,30 +41,42 @@ import com.dp.odls.util.SupportingUtils;
 import com.pd.odls.R;
 import com.pd.odls.test.BaseTestActivity;
 
-import java.io.*;
-import java.lang.Thread.State;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class HandTremorTestActivity extends BaseTestActivity {
 	
 	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_BUFFER_FULL = 20;
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
 	
+	//UI components
 	private Button controlBtn;
 	private TextView elapsedTimeView;
-	private int elapsedTime;
-	private Timer timer;
-	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
-	private DataOutputStream dout;
-	private OdlsDbAdapter databaseManager;
+	protected ProgressDialog countDownDlg;
+
 
 	//Create the timer task to count test elapsed time
-	private TimerTask timerTask;
+	private TimerTask timerTask;	
+	private Timer timer;
+	private int elapsedTime;
+	
+	//Create the timer task to count down time before test begin
+	private CountDownTimerTask countDownTask;
+	
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
+	private DataOutputStream dout;
+	
+	private OdlsDbAdapter databaseManager;
+	
+	private int testType;
 
+	public int getTestType() {
+		return testType;
+	}
+
+	public void setTestType(int testType) {
+		this.testType = testType;
+	}
 	
 	//Create handler to deal with UI change
 	private Handler handler = new Handler() {
@@ -81,6 +106,22 @@ public class HandTremorTestActivity extends BaseTestActivity {
 					Log.e(HandTremorTestActivity.class.getCanonicalName(), e.getMessage());
 				}
 				break;
+			case MSG_COUNT_DOWN:
+				if(msg.arg1 > 0) {
+					HandTremorTestActivity.this.countDownDlg.setMessage(
+							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
+				}
+				else {
+					countDownDlg.dismiss();
+
+					isRunning = true;
+					synchronized (testThread) {
+						testThread.setRunning(isRunning);
+						testThread.start();
+					}
+					beginTime = System.currentTimeMillis();
+				}
+				break;
 			}
 		}
 	};
@@ -88,7 +129,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		showDialog(DLG_INSTRUCTION);
+		showDialog(DLG_INSTRUCTION_1);
 		
 		//create the moving objects for test panel
 		MovingObject mo = new MovingObject(BitmapFactory.decodeResource(
@@ -174,6 +215,14 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	}
 	
 	@Override
+	protected void beginTest() {
+		Timer t = new Timer();
+		countDownDlg = ProgressDialog.show(this, "Ready... Test will begin in", 
+				Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
+		t.schedule(countDownTask, 1000, 1000);
+	}
+	
+	@Override
 	protected void initializeTest() {
 		//Reset buffer to empty
 		buffer.reset();
@@ -185,6 +234,9 @@ public class HandTremorTestActivity extends BaseTestActivity {
 					this, 
 					handler);	
 		}
+		
+		//initialize count down timer task before task beginning
+		this.setCountDownTask(new CountDownTimerTask(3, handler));
 		
 		//initialize test drawing panel to reset drawing
 		testPanel.initialize();
@@ -218,10 +270,50 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		
 		switch (id) {
-		case DLG_INSTRUCTION:
+		case DLG_INSTRUCTION_1:
 			builder.setMessage("Please bind device on your wrist, " +
-					"then press start button when you feel ready" +
-					" to begin test.")
+					"then press Next to proceed to next step, or press cancel to exit test")
+					.setCancelable(false)
+					.setPositiveButton("Next", new DialogInterface.OnClickListener()  {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							try {
+								Thread.sleep(300);
+							}
+							catch(InterruptedException e) {
+								
+							}
+							showDialog(DLG_INSTRUCTION_2);
+						}
+					})
+					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {						
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							finish();
+						}
+					});
+			dialog = builder.create();
+			return dialog;
+		case DLG_INSTRUCTION_2:
+			builder.setMessage("Please select which hand are you going to test, Left or Right?")
+					.setCancelable(false)
+					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Test.TEST_HAND_TREMOR_LEFT);
+							dialog.dismiss();
+						}
+					})
+					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Test.TEST_HAND_TREMOR_RIGHT);
+							dialog.dismiss();
+						}
+					});
+			dialog = builder.create();
+			return dialog;
+		case DLG_INSTRUCTION_3:
+			builder.setMessage("Are you ready to begin the test? Please press Start button to being, "
+					+ "or exit test by pressing Back button on your cell phone")
 					.setCancelable(false)
 					.setPositiveButton("OK", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -271,11 +363,12 @@ public class HandTremorTestActivity extends BaseTestActivity {
 					.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
 						
 						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();							
+							dialog.dismiss();
+							buffer.reset();
 						}
 					});
 			dialog = builder.create();
-			return dialog;	
+			return dialog;			
 		}
 		return super.onCreateDialog(id);
 	}
@@ -303,8 +396,10 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
 		
-		databaseManager.createTest(PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
-				null, Test.TEST_HAND_TREMOR_LEFT,
+		databaseManager.createTest(
+				PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
+				null,
+				testType,
 				beginTime,
 				beginTime,
 				endTime,
@@ -312,12 +407,52 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				test);
+				test
+		);
 		
 		//clear buffer for next use
 		buffer.reset();
 		return true;
 	}
+
+	public TimerTask getCountDownTask() {
+		return countDownTask;
+	}
+
+	public void setCountDownTask(CountDownTimerTask countDownTask) {
+		this.countDownTask = countDownTask;
+	}
 	
+	/**
+	 * TimerTask to perform the time count down before beginning test.
+	 * @author Pan
+	 *
+	 */
+	private class CountDownTimerTask extends TimerTask {
+		
+		private int duration;
+		private Handler handler;
+		
+		public CountDownTimerTask(int duration, Handler h) {
+			this.duration = duration;
+			this.handler = h;
+		}
+		
+		@Override
+		public void run() {
+			duration--;
+			Message m = new Message();
+			m.arg1 = duration;
+			m.what = MSG_COUNT_DOWN;
+			handler.sendMessage(m);
+			if(duration <= 0) {
+				this.cancel();
+			}
+		}
+
+		public int getDuration() {
+			return duration;
+		}		
+	}
 	
 }

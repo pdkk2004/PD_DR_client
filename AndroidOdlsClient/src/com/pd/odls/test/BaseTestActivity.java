@@ -4,10 +4,13 @@ import android.app.Activity;
 
 
 public abstract class BaseTestActivity extends Activity {
-	protected static final int DLG_INSTRUCTION = 19;
+	protected static final int DLG_INSTRUCTION_1 = 31;
+	protected static final int DLG_INSTRUCTION_2 = 32;
+	protected static final int DLG_INSTRUCTION_3 = 33;
 	protected static final int MSG_TEST_TIME_CHANGE = 16;
 
 	protected BaseTestPanel testPanel;
+	
 	protected boolean isRunning;
 	protected boolean pause;
 	protected BaseTestThread testThread;
