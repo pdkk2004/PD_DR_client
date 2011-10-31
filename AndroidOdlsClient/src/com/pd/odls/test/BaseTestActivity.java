@@ -8,6 +8,10 @@ public abstract class BaseTestActivity extends Activity {
 	protected static final int DLG_INSTRUCTION_2 = 32;
 	protected static final int DLG_INSTRUCTION_3 = 33;
 	protected static final int DLG_INTERRUPT_TEST = 29;
+	protected static final int DLG_BUFFER_FULL = 20;
+	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_COUNT_DOWN = 24;
+
 
 	protected static final int MSG_TEST_TIME_CHANGE = 16;
 

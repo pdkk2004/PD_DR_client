@@ -1,4 +1,4 @@
-package com.pd.odls.test.legtremor;
+package com.pd.odls.test;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,12 +11,10 @@ import android.view.SurfaceHolder;
 
 import com.pd.odls.accelorator.AccelerometerDelegate;
 import com.pd.odls.accelorator.SimulatedAccelerometer;
-import com.pd.odls.test.BaseTestPanel;
-import com.pd.odls.test.BaseTestThread;
 
-public class LegTremorTestThread extends BaseTestThread {
+public class MotionSensingThread extends BaseTestThread {
 	
-	private static final String TAG = LegTremorTestThread.class.getSimpleName();
+	private static final String TAG = MotionSensingThread.class.getSimpleName();
 
 	private Context context;
 	private int offSetX;
@@ -30,7 +28,7 @@ public class LegTremorTestThread extends BaseTestThread {
 	private Handler handler;
 
 	
-	public LegTremorTestThread(BaseTestPanel testPanel,
+	public MotionSensingThread(BaseTestPanel testPanel,
 			SurfaceHolder surfaceHolder, DataOutputStream dout, Context context, Handler handler) {
 		super(testPanel, surfaceHolder);
 		this.offSetX = 0;
@@ -69,7 +67,7 @@ public class LegTremorTestThread extends BaseTestThread {
 			}
 			
 			if(dout.size() >= 3 * 4 * 5 * 1000)
-				handler.sendEmptyMessage(LegTremorTestActivity.MSG_BUFFER_FULL);				
+				handler.sendEmptyMessage(BaseTestActivity.MSG_BUFFER_FULL);				
 		}
 
 		public void onShake(float force) {
@@ -137,6 +135,4 @@ public class LegTremorTestThread extends BaseTestThread {
 				accelerometer.stop();
 		}
 	}
-	
-	
 }

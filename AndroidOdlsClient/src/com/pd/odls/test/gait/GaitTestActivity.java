@@ -42,6 +42,7 @@ import com.pd.odls.model.Test;
 import com.pd.odls.model.User;
 import com.pd.odls.sqlite.OdlsDbAdapter;
 import com.pd.odls.test.BaseTestActivity;
+import com.pd.odls.test.MotionSensingThread;
 import com.pd.odls.util.SupportingUtils;
 
 public class GaitTestActivity extends BaseTestActivity {
@@ -235,7 +236,7 @@ public class GaitTestActivity extends BaseTestActivity {
 		
 		//initialize test thread
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
-			testThread = new GaitTestThread(testPanel, 
+			testThread = new MotionSensingThread(testPanel, 
 					testPanel.getHolder(), 
 					dout,
 					this, 
@@ -275,19 +276,35 @@ public class GaitTestActivity extends BaseTestActivity {
 	@Override
 	protected void beginTest() {
 		//Vibrate for 500 milliseconds to indicate test begin
-		long[] pattern = {500};
+		long[] pattern = {0, 1000};
 		SupportingUtils.vibrate(this, pattern);
-		timer.schedule(timerTask, 0, 1000);
-		super.beginTest();
+		try {
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		finally {
+			timer.schedule(timerTask, 0, 1000);
+			super.beginTest();
+		}
 	}
 
 	@Override
 	protected void stopTest() {
 		super.stopTest();
 		timer.cancel();
+		try {
+			Thread.sleep(500);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		finally {
 		//Vibrate for 500 milliseconds stop 200 millisecond for 2 times to indicate test stop
-		long[] pattern = {500, 200, 500};
-		SupportingUtils.vibrate(this, pattern);
+			long[] pattern = {0, 1000, 500, 1000};
+			SupportingUtils.vibrate(this, pattern);
+		}
 	}
 
 	@Override
