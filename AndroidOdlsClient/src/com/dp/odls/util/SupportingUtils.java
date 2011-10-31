@@ -3,6 +3,7 @@ package com.dp.odls.util;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Vibrator;
 
 public class SupportingUtils {
 	
@@ -17,6 +18,11 @@ public class SupportingUtils {
 	        return true;
 	    }
 	    return false;
+	}
+	
+	public static void vibrate(Context context, long[] pattern) {
+		Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+		v.vibrate(pattern, -1);
 	}
 
 }

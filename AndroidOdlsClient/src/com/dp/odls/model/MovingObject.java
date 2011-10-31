@@ -1,4 +1,4 @@
-package com.pd.odls.test.handtremor;
+package com.dp.odls.model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

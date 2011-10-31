@@ -176,8 +176,5 @@ public class RegistryActivity extends Activity implements Runnable {
 	public void finish() {
 		setResult(result, null);
 		super.finish();
-	}
-	
-	
-	
+	}	
 }

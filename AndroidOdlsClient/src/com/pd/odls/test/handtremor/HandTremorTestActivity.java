@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.dp.odls.model.MovingObject;
 import com.dp.odls.model.Test;
 import com.dp.odls.model.User;
 import com.dp.odls.sqlite.OdlsDbAdapter;
@@ -108,10 +109,12 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
+					System.out.println("Count time -1");
 					HandTremorTestActivity.this.countDownDlg.setMessage(
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
 				}
 				else {
+					System.out.println("Ready to begin");
 					countDownDlg.dismiss();
 					beginTest();
 				}
@@ -183,7 +186,6 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		
 		//prepare database manager to save test data
 		databaseManager = new OdlsDbAdapter(this);
-		databaseManager.open();
 		
 		//initialize DataOutputStream to store sensed data
 		this.dout = new DataOutputStream(buffer);
@@ -223,6 +225,11 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	protected void initializeTest() {
 		//Reset buffer to empty
 		buffer.reset();
+		
+		//Reset isRunning to false
+		isRunning = false;
+		pause = false;
+		
 		//initialize test thread
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
 			testThread = new HandTremorTestThread(testPanel, 
@@ -252,15 +259,34 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						catch (InterruptedException e) {
 							Log.e(this.getClass().getName(), e.getMessage());
 						}
-					}					
+					}
 				}
 			}			
 		};
 		timer = new Timer();
 		elapsedTime = 0;	
-		timer.schedule(timerTask, 0, 1000);
 	}	
 	
+	
+	
+	@Override
+	protected void beginTest() {
+		//Vibrate for 500 milliseconds to indicate test begin
+		long[] pattern = {500};
+		SupportingUtils.vibrate(this, pattern);
+		timer.schedule(timerTask, 0, 1000);
+		super.beginTest();
+	}
+
+	@Override
+	protected void stopTest() {
+		super.stopTest();
+		timer.cancel();
+		//Vibrate for 500 milliseconds stop 200 millisecond for 2 times to indicate test stop
+		long[] pattern = {500, 200, 500};
+		SupportingUtils.vibrate(this, pattern);
+	}
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog;
@@ -298,19 +324,22 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Test.TEST_HAND_TREMOR_LEFT);
 							dialog.dismiss();
+							showDialog(DLG_INSTRUCTION_3);
 						}
 					})
 					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Test.TEST_HAND_TREMOR_RIGHT);
 							dialog.dismiss();
+							showDialog(DLG_INSTRUCTION_3);
 						}
 					});
 			dialog = builder.create();
 			return dialog;
 		case DLG_INSTRUCTION_3:
-			builder.setMessage("Are you ready to begin the test? Please press Start button to being, "
-					+ "or exit test by pressing Back button on your cell phone")
+			builder.setMessage(Html.fromHtml("Are you ready to begin the test? Please press Start button to begin, "
+					+ "or exit test by pressing <font color = 'yellow'><b>Back</b></font> button on your cell phone\n<br />" + 
+					"<font color = 'red'><b>You will feel a short vibration when test start.</b></font>"))
 					.setCancelable(false)
 					.setPositiveButton("OK", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -355,6 +384,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							storeToDatabase();
 							dialog.dismiss();
+							leave();
 						}
 					})
 					.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
@@ -362,10 +392,35 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
 							buffer.reset();
+							leave();
 						}
 					});
 			dialog = builder.create();
-			return dialog;			
+			return dialog;
+		case DLG_INTERRUPT_TEST:
+			builder.setMessage("Are you sure you are going to leave current ruuning test? The test data will not be saved if you leave.\n" +
+					"Press OK to leave current test.\n" +
+					"Press Cancel to resume to test.")
+			.setCancelable(false)
+			.setPositiveButton("OK", new DialogInterface.OnClickListener()  {
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+//					pauseOrResume();
+					stopTest();
+					timer.cancel();
+					controlBtn.setText("Start");
+					HandTremorTestActivity.this.leave();
+				}
+			})
+			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					pauseOrResume();
+				}
+			});
+	dialog = builder.create();
+	return dialog;			
 		}
 		return super.onCreateDialog(id);
 	}
@@ -451,5 +506,44 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			return duration;
 		}		
 	}
+
+	@Override
+	public void finish() {
+		if(isRunning) {
+			pauseOrResume();
+			this.showDialog(DLG_INTERRUPT_TEST);
+		}
+		else {
+			super.finish();			
+		}
+	}
 	
+	/*
+	 * Force leave current test
+	 */
+	public void leave() {
+		testThread = null;
+		try {
+			if(databaseManager.isOnOpen())
+				databaseManager.close();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		super.finish();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		testThread = null;
+		try {
+			if(databaseManager.isOnOpen())
+				databaseManager.close();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		databaseManager = null;
+		super.onDestroy();
+	}
 }

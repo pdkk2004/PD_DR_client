@@ -1,4 +1,4 @@
-package com.pd.odls.test.handtremor;
+package com.pd.odls.test.legtremor;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,13 +9,13 @@ import android.util.Log;
 import com.dp.odls.model.MovingObject;
 import com.pd.odls.test.BaseTestPanel;
 
-public class HandTremorTestPanel extends BaseTestPanel {
+public class LegTremorTestPanel extends BaseTestPanel {
 
-	private static final String TAG = HandTremorTestPanel.class.getSimpleName();
+	private static final String TAG = LegTremorTestPanel.class.getSimpleName();
 
 	private MovingObject target;
 	
-	public HandTremorTestPanel(Context context, MovingObject o) {
+	public LegTremorTestPanel(Context context, MovingObject o) {
 		super(context);
 		this.target = o;
 	}
