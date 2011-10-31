@@ -1,4 +1,4 @@
-package com.dp.odls.model;
+package com.pd.odls.model;
 
 public class User {
 	public static final String USER_INFO = "user_info";

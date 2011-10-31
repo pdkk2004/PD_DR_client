@@ -9,8 +9,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.dp.odls.accelorator.AccelerometerDelegate;
-import com.dp.odls.accelorator.SimulatedAccelerometer;
+import com.pd.odls.accelorator.AccelerometerDelegate;
+import com.pd.odls.accelorator.SimulatedAccelerometer;
 import com.pd.odls.test.BaseTestPanel;
 import com.pd.odls.test.BaseTestThread;
 

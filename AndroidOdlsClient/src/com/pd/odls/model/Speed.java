@@ -1,4 +1,4 @@
-package com.dp.odls.model;
+package com.pd.odls.model;
 
 public class Speed {
 	

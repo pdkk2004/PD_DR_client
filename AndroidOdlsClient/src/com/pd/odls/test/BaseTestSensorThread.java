@@ -2,7 +2,7 @@ package com.pd.odls.test;
 
 import android.os.Handler;
 
-import com.dp.odls.accelorator.Accelerometer;
+import com.pd.odls.accelorator.Accelerometer;
 
 public class BaseTestSensorThread extends Thread {
 	private Accelerometer testSensor;

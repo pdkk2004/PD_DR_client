@@ -1,4 +1,4 @@
-package com.dp.odls.sqlite;
+package com.pd.odls.sqlite;
 
 import android.content.Context;
 import android.database.SQLException;

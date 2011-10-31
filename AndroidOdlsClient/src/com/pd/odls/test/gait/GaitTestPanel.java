@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.util.Log;
 
-import com.dp.odls.model.MovingObject;
+import com.pd.odls.model.MovingObject;
 import com.pd.odls.test.BaseTestPanel;
 
 public class GaitTestPanel extends BaseTestPanel {

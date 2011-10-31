@@ -1,4 +1,4 @@
-package com.dp.odls.accelorator;
+package com.pd.odls.accelorator;
 
 import java.util.List;
 

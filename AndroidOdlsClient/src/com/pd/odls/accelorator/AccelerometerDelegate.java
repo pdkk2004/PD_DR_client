@@ -1,4 +1,4 @@
-package com.dp.odls.accelorator;
+package com.pd.odls.accelorator;
 
 /**
  * Accelerometer delegate to process accelerometer data. Aimed to be implemented.

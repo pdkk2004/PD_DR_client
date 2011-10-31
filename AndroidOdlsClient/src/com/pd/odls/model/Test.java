@@ -1,11 +1,11 @@
-package com.dp.odls.model;
+package com.pd.odls.model;
 
 import java.sql.Date;
 import java.sql.Time;
 
 import android.database.Cursor;
-import com.dp.odls.sqlite.OdlsDbAdapter;
 import com.pd.odls.R;
+import com.pd.odls.sqlite.OdlsDbAdapter;
 
 
 /**

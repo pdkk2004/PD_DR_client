@@ -1,4 +1,4 @@
-package com.dp.odls.util;
+package com.pd.odls.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

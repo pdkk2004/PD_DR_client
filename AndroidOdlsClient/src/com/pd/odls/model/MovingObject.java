@@ -1,4 +1,4 @@
-package com.dp.odls.model;
+package com.pd.odls.model;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

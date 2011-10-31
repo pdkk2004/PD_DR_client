@@ -32,10 +32,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dp.odls.model.User;
 import com.pd.odls.R;
 import com.pd.odls.http.OdlsHttpClientHelper;
 import com.pd.odls.main.MainControlActivity;
+import com.pd.odls.model.User;
 import com.pd.odls.registry.RegistryActivity;
 
 

@@ -1,4 +1,4 @@
-package com.dp.odls.accelorator;
+package com.pd.odls.accelorator;
 
 import org.openintents.sensorsimulator.hardware.Sensor;
 import org.openintents.sensorsimulator.hardware.SensorEvent;
