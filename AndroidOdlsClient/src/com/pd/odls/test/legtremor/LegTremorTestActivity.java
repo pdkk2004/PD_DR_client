@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -297,7 +296,7 @@ public class LegTremorTestActivity extends BaseTestActivity {
 		}
 		finally {
 		//Vibrate for 500 milliseconds stop 200 millisecond for 2 times to indicate test stop
-			long[] pattern = {0, 1000, 500, 1000};
+			long[] pattern = {0, 500, 200, 500};
 			SupportingUtils.vibrate(this, pattern);
 		}
 	}
@@ -452,14 +451,9 @@ public class LegTremorTestActivity extends BaseTestActivity {
 			}
 		}
 		
-		System.out.println(buffer.toString());
-		
 		byte[] data = buffer.toByteArray();
-		System.out.println(Arrays.toString(data));
-		byte[] test = {1, 2, 3, 4, 5};
-		System.out.println(Arrays.toString(test));
 
-		int samplePoints = data.length / SupportingUtils.bytesPerPoint;
+		int samplePoints = data.length / SupportingUtils.BYTES_PER_SAMPLING;
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
 		
@@ -474,7 +468,7 @@ public class LegTremorTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				test
+				data
 		);
 		
 		//clear buffer for next use

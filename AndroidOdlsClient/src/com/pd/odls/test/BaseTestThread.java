@@ -5,13 +5,14 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 
-public class BaseTestThread extends Thread {
+public abstract class BaseTestThread extends Thread {
 	
 	private static final String TAG = BaseTestThread.class.getSimpleName();
 	
-	//flag to hold test state
+	//flags to indicate test state
 	protected boolean isRunning = false;
-	protected boolean pause = false;
+	protected boolean paused = false;
+	
 	protected BaseTestPanel testPanel;
 	protected SurfaceHolder surfaceHolder;
 	
@@ -35,15 +36,15 @@ public class BaseTestThread extends Thread {
 	}
 	
 	public void setPause(boolean pause) {
-		this.pause = pause;
+		this.paused = pause;
 	}
 	
 	public boolean getPauseStatus() {
-		return pause;
+		return paused;
 	}
 	
 	public void changePauseStatus() {
-		this.pause = !this.pause;
+		this.paused = !this.paused;
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class BaseTestThread extends Thread {
 			
 			//check whether it is paused
 			synchronized (this) {
-				if(pause) {
+				if(paused) {
 					try {
 						wait();
 					}
@@ -78,5 +79,10 @@ public class BaseTestThread extends Thread {
 				}
 			}
 		}
-	}	
+	}
+	
+	/**
+	 * Set up Accelerometer associated with this thread
+	 */
+	public abstract void initializeAccelerometer();
 }

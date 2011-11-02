@@ -64,14 +64,12 @@ public class LegTremorTestPanel extends BaseTestPanel {
 	}
 
 	@Override
-	public void update(int x, int y) {
-		target.changePosition(x, y);
+	public Point update(int x, int y, int z) {
+		return target.changePosition(x, y, canvas.getWidth()/2, (canvas.getHeight() - 50) * 6/7/2 );
 	}
 	
 	@Override
 	public void update() {
-		target.changePosition(2, 2);
+		target.changePosition(2, 2, canvas.getWidth()/2, (canvas.getHeight() - 50) * 6/7/2 );
 	}
-
-	
 }

@@ -16,7 +16,7 @@ public class Accelerometer {
     private SensorManager sensorManager;
     private float threshold = 0.2f;      //default value of threshold
     private int interval = 1000;         //default value of interval
-    private int rate = SensorManager.SENSOR_DELAY_GAME;   
+    private int rate = SensorManager.SENSOR_DELAY_FASTEST;   
     private Handler handler;
     
 	private Sensor sensor;

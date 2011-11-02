@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,6 +17,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +30,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -40,6 +45,7 @@ import com.pd.odls.model.Test;
 import com.pd.odls.model.User;
 import com.pd.odls.sqlite.OdlsDbAdapter;
 import com.pd.odls.test.BaseTestActivity;
+import com.pd.odls.test.DrawPattern;
 import com.pd.odls.test.MotionSensingThread;
 import com.pd.odls.util.SupportingUtils;
 
@@ -54,7 +60,6 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	private Button controlBtn;
 	private TextView elapsedTimeView;
 	protected ProgressDialog countDownDlg;
-
 
 	//Create the timer task to count test elapsed time
 	private TimerTask timerTask;	
@@ -236,7 +241,41 @@ public class HandTremorTestActivity extends BaseTestActivity {
 					testPanel.getHolder(), 
 					dout,
 					this, 
-					handler);	
+					handler);
+			
+			//set DrawMotionTrace interface for test thread, which decouple the DrawMotionTrace with testThread.
+			((MotionSensingThread)testThread).setDrawMotionTrace(new DrawPattern() {
+				
+				public void draw(Canvas canvas) {
+					SurfaceHolder surfaceHolder = testPanel.getHolder();
+					try {
+						canvas = surfaceHolder.lockCanvas();
+						synchronized (surfaceHolder) {
+							//add moving object position to motion trace, which is stored in ArrayList tracePoints
+							canvas.drawColor(Color.WHITE);
+							
+							Paint paint = new Paint();
+							paint.setColor(Color.BLUE);
+							paint.setStrokeWidth(2);
+							paint.setStyle(Paint.Style.STROKE);
+
+							Point[] pts = ((MotionSensingThread)testThread).getTracePoints().
+									toArray(new Point[((MotionSensingThread)testThread).getTracePoints().size()]);
+							Path path = new Path();
+							path.moveTo(pts[0].x, pts[0].y);
+							for (int i = 1; i < pts.length; i++){
+								path.lineTo(pts[i].x, pts[i].y);
+							}
+							canvas.drawPath(path, paint);
+						}
+					}
+					finally {
+						if(canvas != null)
+							surfaceHolder.unlockCanvasAndPost(canvas);
+					}						
+				}				
+			});
+			
 		}
 		
 		//initialize count down timer task before task beginning
@@ -272,7 +311,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	@Override
 	protected void beginTest() {
 		//Vibrate for 500 milliseconds to indicate test begin
-		long[] pattern = {0, 1000};
+		long[] pattern = {0, 500};
 		SupportingUtils.vibrate(this, pattern);
 		try {
 			Thread.sleep(1000);
@@ -298,7 +337,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		}
 		finally {
 		//Vibrate for 500 milliseconds stop 200 millisecond for 2 times to indicate test stop
-			long[] pattern = {0, 1000, 500, 1000};
+			long[] pattern = {0, 500, 200, 500};
 			SupportingUtils.vibrate(this, pattern);
 		}
 	}
@@ -400,7 +439,6 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							storeToDatabase();
 							dialog.dismiss();
-							leave();
 						}
 					})
 					.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
@@ -408,7 +446,6 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
 							buffer.reset();
-							leave();
 						}
 					});
 			dialog = builder.create();
@@ -452,15 +489,10 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				return false;
 			}
 		}
-		
-		System.out.println(buffer.toString());
-		
+				
 		byte[] data = buffer.toByteArray();
-		System.out.println(Arrays.toString(data));
-		byte[] test = {1, 2, 3, 4, 5};
-		System.out.println(Arrays.toString(test));
 
-		int samplePoints = data.length / SupportingUtils.bytesPerPoint;
+		int samplePoints = data.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
 		
@@ -475,9 +507,9 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				test
+				data
 		);
-		
+				
 		//clear buffer for next use
 		buffer.reset();
 		return true;
@@ -535,7 +567,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	}
 	
 	/*
-	 * Force leave current test
+	 * Release resource, close database and then call finish() to go back to parent view.
 	 */
 	public void leave() {
 		testThread = null;

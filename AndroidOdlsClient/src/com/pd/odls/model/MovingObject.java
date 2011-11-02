@@ -47,9 +47,10 @@ public class MovingObject {
 		this.position = position;
 	}
 	
-	public void changePosition(int x, int y) {
-		position.x += x;
-		position.y += y;
+	public Point changePosition(int x, int y, int refX, int refY) {
+		position.x = refX - x * 30;
+		position.y = refY + y * 30;
+		return new Point(position.x - width/2, position.y - height/2);
 	}
 	
 	public void draw(Canvas canvas) {

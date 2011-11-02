@@ -2,9 +2,14 @@ package com.pd.odls.test;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -19,25 +24,32 @@ public class MotionSensingThread extends BaseTestThread {
 	private Context context;
 	private int offSetX;
 	private int offSetY;
+	private int offSetZ;
+	private ArrayList<Point> tracePoints = new ArrayList<Point>();
+	
+	private DrawPattern drawMotionTrace;
 	
 	//TODO change SimulatedAccelerometer to Accelerometer in production
 //	private Accelerometer accelerometer;
 	private SimulatedAccelerometer accelerometer;
 	
 	private DataOutputStream dout;
+	
+	@SuppressWarnings("unused")
 	private Handler handler;
-
 	
 	public MotionSensingThread(BaseTestPanel testPanel,
 			SurfaceHolder surfaceHolder, DataOutputStream dout, Context context, Handler handler) {
 		super(testPanel, surfaceHolder);
 		this.offSetX = 0;
 		this.offSetY = 0;
+		this.offSetZ = 0;
 		this.context = context;
 		this.dout = dout;
 		this.handler = handler;
 	}
 	
+	@Override
 	public void initializeAccelerometer() {
 		if(context != null) {
 			//TODO change SimulatedAccelerometer to Accelerometer in production			
@@ -57,17 +69,16 @@ public class MotionSensingThread extends BaseTestThread {
 			try {
 				offSetX = Math.round(x);
 				offSetY = Math.round(y);
+				offSetZ = Math.round(z);
 				dout.writeFloat(x);
 				dout.writeFloat(y);
-				dout.writeFloat(z);
+				dout.writeFloat(z - (float)9.98);
 				dout.flush();
+				System.out.println("Acceleration:" + x + " " + y + " " + z);
 			}
 			catch(IOException e) {
 				Log.e(this.getClass().getName(), e.getMessage());
-			}
-			
-			if(dout.size() >= 3 * 4 * 5 * 1000)
-				handler.sendEmptyMessage(BaseTestActivity.MSG_BUFFER_FULL);				
+			}		
 		}
 
 		public void onShake(float force) {
@@ -87,7 +98,9 @@ public class MotionSensingThread extends BaseTestThread {
 			try {
 				canvas = this.surfaceHolder.lockCanvas();
 				synchronized (this.surfaceHolder) {
-					this.testPanel.update(offSetX, offSetY);
+					//add moving object position to motion trace, which is stored in ArrayList tracePoints
+					tracePoints.add(this.testPanel.update(offSetX, offSetY, offSetZ));
+					
 					this.testPanel.render(canvas);
 				}
 			}
@@ -99,7 +112,7 @@ public class MotionSensingThread extends BaseTestThread {
 			
 			//check whether it is paused
 			synchronized (this) {
-				if(pause) {
+				if(paused) {
 					try {
 						wait();
 					}
@@ -110,6 +123,9 @@ public class MotionSensingThread extends BaseTestThread {
 			}
 		}
 		Log.i(TAG, "Stop test");
+		Log.i(TAG, "Draw tremor trace");
+		if(drawMotionTrace != null)
+			drawMotionTrace.draw(canvas);
 	}
 
 	@Override
@@ -129,10 +145,54 @@ public class MotionSensingThread extends BaseTestThread {
 	public void changePauseStatus() {
 		super.changePauseStatus();
 		if(accelerometer != null) {
-			if(!pause)
+			if(!paused)
 				accelerometer.start();
 			else
 				accelerometer.stop();
 		}
 	}
+	
+	/**
+	 * draw tracked motion trace at one time after after test finish
+	 */
+	public void drawMotionTrace(Canvas canvas) {
+		try {
+			canvas = this.surfaceHolder.lockCanvas();
+			synchronized (this.surfaceHolder) {
+				//add moving object position to motion trace, which is stored in ArrayList tracePoints
+				canvas.drawColor(Color.WHITE);
+				
+				Paint paint = new Paint();
+				paint.setColor(Color.BLUE);
+				paint.setStrokeWidth(2);
+				paint.setStyle(Paint.Style.STROKE);
+
+				Point[] pts = tracePoints.toArray(new Point[tracePoints.size()]);
+				Path path = new Path();
+				path.moveTo(pts[0].x, pts[0].y);
+				for (int i = 1; i < pts.length; i++){
+					path.lineTo(pts[i].x, pts[i].y);
+				}
+				canvas.drawPath(path, paint);
+			}
+		}
+		finally {
+			if(canvas != null)
+				surfaceHolder.unlockCanvasAndPost(canvas);
+		}		
+	}
+
+	public DrawPattern getDrawMotionTrace() {
+		return drawMotionTrace;
+	}
+
+	public void setDrawMotionTrace(DrawPattern drawMotionTrace) {
+		this.drawMotionTrace = drawMotionTrace;
+	}
+
+	public ArrayList<Point> getTracePoints() {
+		return tracePoints;
+	}
+	
+	
 }

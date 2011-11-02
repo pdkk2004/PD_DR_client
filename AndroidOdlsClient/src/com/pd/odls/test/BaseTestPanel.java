@@ -2,6 +2,7 @@ package com.pd.odls.test;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -38,7 +39,10 @@ public abstract class BaseTestPanel extends SurfaceView
 	
 	public abstract void initialize();
 	
-	public abstract void update(int x, int y);
+	/**
+	 * Update moving object on panel and return the new position of moving object.
+	 */
+	public abstract Point update(int x, int y, int z);
 	
 	public abstract void update();
 	
