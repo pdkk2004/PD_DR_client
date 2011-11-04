@@ -16,7 +16,8 @@
 		<activity android:name=".test.handtremor.HandTremorTestActivity" />
 		<activity android:name=".test.legtremor.LegTremorTestActivity" />
 		<activity android:name=".test.gait.GaitTestActivity" />
-		<activity android:name=".test.tapping.TappingTestActivity" />
+		<activity android:name=".test.finger.FingerTappingTestActivity"
+		    android:screenOrientation="landscape"/>
 		
 		<activity android:name=".main.Preferences" android:label="Preferences"></activity>
 		<activity android:name=".testlist.TestHistoryListActivity" />

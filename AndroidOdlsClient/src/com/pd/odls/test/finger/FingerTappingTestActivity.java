@@ -1,4 +1,4 @@
-package com.pd.odls.test.handtremor;
+package com.pd.odls.test.finger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,34 +10,29 @@ import java.lang.Thread.State;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.R.color;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.ViewGroup.MarginLayoutParams;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.ToggleButton;
 
 import com.pd.odls.R;
 import com.pd.odls.model.MovingObject;
@@ -45,11 +40,9 @@ import com.pd.odls.model.Test;
 import com.pd.odls.model.User;
 import com.pd.odls.sqlite.OdlsDbAdapter;
 import com.pd.odls.test.BaseTestActivity;
-import com.pd.odls.test.DrawPattern;
-import com.pd.odls.test.MotionSensingThread;
 import com.pd.odls.util.SupportingUtils;
 
-public class HandTremorTestActivity extends BaseTestActivity {
+public class FingerTappingTestActivity extends BaseTestActivity {
 	
 	public static final int MSG_BUFFER_FULL = 25;
 	public static final int MSG_COUNT_DOWN = 24;
@@ -57,8 +50,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	private static final int DLG_TEST_DONE = 30;
 	
 	//UI components
-	private Button controlBtn;
-	private TextView elapsedTimeView;
+	private ToggleButton controlBtn;
+	private ProgressBar testProgressBar;
 	protected ProgressDialog countDownDlg;
 
 	//Create the timer task to count test elapsed time
@@ -91,13 +84,13 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 			case MSG_TEST_TIME_CHANGE:
-				elapsedTimeView.setText(String.valueOf(elapsedTime));
+				testProgressBar.setProgress((int)Math.round(elapsedTime / 30.0 * 100.0));
 				break;
 			case MSG_BUFFER_FULL:
 				stopTest();
 				timer.cancel();
-				controlBtn.setText("Start");
-				showDialog(HandTremorTestActivity.DLG_BUFFER_FULL);
+//				controlBtn.setImageResource(R.drawable.start_80);
+				showDialog(FingerTappingTestActivity.DLG_BUFFER_FULL);
 				
 				DataInputStream din = new DataInputStream(new ByteArrayInputStream(buffer.toByteArray()));
 				try {
@@ -109,13 +102,13 @@ public class HandTremorTestActivity extends BaseTestActivity {
 					Log.i(this.toString(), "Reach end of buffer");
 				}
 				catch(IOException e) {
-					Log.e(HandTremorTestActivity.class.getCanonicalName(), e.getMessage());
+					Log.e(FingerTappingTestActivity.class.getCanonicalName(), e.getMessage());
 				}
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
 					System.out.println("Count time -1");
-					HandTremorTestActivity.this.countDownDlg.setMessage(
+					FingerTappingTestActivity.this.countDownDlg.setMessage(
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
 				}
 				else {
@@ -135,37 +128,48 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		
 		//create the moving objects for test panel
 		MovingObject mo = new MovingObject(BitmapFactory.decodeResource(
-				getResources(), R.drawable.red_point));
+				getResources(), R.drawable.target_80));
 		
-		//create the test panel 
-		testPanel = new HandTremorTestPanel(this, mo);
+		//create the test panel
+		testPanel = new FingerTappingTestPanel(this, mo);
+		
 		testPanel.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View view, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_DOWN) {
-					pauseOrResume();
+					if(isRunning && ((FingerTappingTestPanel)testPanel).
+							hitTouchTarget((int)event.getX(), (int)event.getY())) {
+						synchronized(testThread) {
+							testThread.notify();
+						}
+					}
+					else {
+						
+					}
 					return true;
 				}
 				return false;
 			}		
 		});
 		
-		//build the test view at run time
-		LayoutInflater inflater = (LayoutInflater)this.
-				getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		testPanel.setLayoutParams(new FrameLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		View controlPanel = inflater.inflate(R.layout.hand_tremor_test_control, layout, false);
-
-		controlPanel.setLayoutParams(new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 6));
-		testPanel.setLayoutParams(new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1));
-		layout.addView(testPanel);
-		layout.addView(controlPanel);
-		setContentView(layout);
+		//set the frame layout as the container to overlay test panel, control button, and test progress bar
+		FrameLayout layout = new FrameLayout(this);
+		layout.setBackgroundColor(color.white);
 		
-		controlBtn = (Button)findViewById(R.id.btn_control);
+		layout.setLayoutParams(new FrameLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		
+		//set the control button to start/stop test
+		controlBtn = new ToggleButton(this);
+		controlBtn.setText(" ");
+		controlBtn.setTextOn(" ");
+		controlBtn.setTextOff(" ");
+		controlBtn.setBackgroundDrawable(getResources().getDrawable(R.drawable.play_btn_selector));
+		
+		controlBtn.setLayoutParams(new FrameLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL));
 		
 		controlBtn.setOnClickListener(new OnClickListener() {
 
@@ -173,21 +177,33 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				if(isRunning == false) {
 					initializeTest();
 					Timer t = new Timer();
-					countDownDlg = ProgressDialog.show(HandTremorTestActivity.this, "Ready... Test will begin in", 
+					countDownDlg = ProgressDialog.show(FingerTappingTestActivity.this, "Ready... Test will begin in", 
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
 					t.schedule(countDownTask, 1000, 1000);
-					controlBtn.setText("Stop");		
 				}
 				else {
 					stopTest();
 					timer.cancel();
-					controlBtn.setText("Start");
 					showDialog(DLG_TEST_DONE);
 				}
 			}		
 		});	
 		
-		elapsedTimeView = (TextView)findViewById(R.id.textView_elapsedTime);
+		//set the test progress bar
+		testProgressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal | android.R.attr.progressBarStyleLarge);
+		testProgressBar.setLayoutParams(new FrameLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL));
+		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(new MarginLayoutParams(0, 10));
+		testProgressBar.setLayoutParams(params);
+		testProgressBar.setProgress(0);
+		
+		//set up the view layout
+		layout.addView(testPanel);
+		layout.addView(testProgressBar);
+		layout.addView(controlBtn);
+
+		//set view content to activity
+		setContentView(layout);
 		
 		//prepare database manager to save test data
 		databaseManager = new OdlsDbAdapter(this);
@@ -196,6 +212,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		this.dout = new DataOutputStream(buffer);
 	}
 	
+		
 	@Override
 	protected void pauseOrResume() {
 		if(isRunning == false) {
@@ -237,45 +254,11 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		
 		//initialize test thread
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
-			testThread = new HandTremorTestThread(testPanel, 
+			testThread = new FingerTappingTestThread(testPanel, 
 					testPanel.getHolder(), 
 					dout,
 					this, 
 					handler);
-			
-			//set DrawMotionTrace interface for test thread, which decouple the DrawMotionTrace with testThread.
-			((MotionSensingThread)testThread).setDrawMotionTrace(new DrawPattern() {
-				
-				public void draw(Canvas canvas) {
-					SurfaceHolder surfaceHolder = testPanel.getHolder();
-					try {
-						canvas = surfaceHolder.lockCanvas();
-						synchronized (surfaceHolder) {
-							//add moving object position to motion trace, which is stored in ArrayList tracePoints
-							canvas.drawColor(Color.WHITE);
-							
-							Paint paint = new Paint();
-							paint.setColor(Color.BLUE);
-							paint.setStrokeWidth(2);
-							paint.setStyle(Paint.Style.STROKE);
-
-							Point[] pts = ((MotionSensingThread)testThread).getTracePoints().
-									toArray(new Point[((MotionSensingThread)testThread).getTracePoints().size()]);
-							Path path = new Path();
-							path.moveTo(pts[0].x, pts[0].y);
-							for (int i = 1; i < pts.length; i++){
-								path.lineTo(pts[i].x, pts[i].y);
-							}
-							canvas.drawPath(path, paint);
-						}
-					}
-					finally {
-						if(canvas != null)
-							surfaceHolder.unlockCanvasAndPost(canvas);
-					}						
-				}				
-			});
-			
 		}
 		
 		//initialize count down timer task before task beginning
@@ -321,6 +304,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		}
 		finally {
 			timer.schedule(timerTask, 0, 1000);
+			testProgressBar.setVisibility(View.VISIBLE);
 			super.beginTest();
 		}
 	}
@@ -349,52 +333,30 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		
 		switch (id) {
 		case DLG_INSTRUCTION_1:
-			builder.setMessage("Please bind device on your wrist, " +
-					"then press Next to proceed to next step, or press cancel to exit test")
+			builder.setMessage(Html.fromHtml("Please hold your device in landscape orientation. \n<br />" +
+					"<font color = 'yellow'><b>Then please select which hand are you going to test, Left or Right?</b></front>"))
 					.setCancelable(false)
-					.setPositiveButton("Next", new DialogInterface.OnClickListener()  {
+					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Test.TEST_FINGER_TAPPING_LEFT);
 							dialog.dismiss();
-							try {
-								Thread.sleep(300);
-							}
-							catch(InterruptedException e) {
-								
-							}
 							showDialog(DLG_INSTRUCTION_2);
 						}
 					})
-					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {						
+					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Test.TEST_FINGER_TAPPING_RIGHT);
 							dialog.dismiss();
-							finish();
+							showDialog(DLG_INSTRUCTION_2);
 						}
 					});
 			dialog = builder.create();
 			return dialog;
 		case DLG_INSTRUCTION_2:
-			builder.setMessage("Please select which hand are you going to test, Left or Right?")
-					.setCancelable(false)
-					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
-						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Test.TEST_HAND_TREMOR_LEFT);
-							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_3);
-						}
-					})
-					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Test.TEST_HAND_TREMOR_RIGHT);
-							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_3);
-						}
-					});
-			dialog = builder.create();
-			return dialog;
-		case DLG_INSTRUCTION_3:
-			builder.setMessage(Html.fromHtml("Are you ready to begin the test? Please press Start button to begin, "
+			builder.setMessage(Html.fromHtml("In this test, you need to use your index finger to touch the red target, alternative displaying on diagnal position on the screen?" +
+					"The test time is 30 seconds.Please press <font color = 'red'><b>Start</b></font> button to begin, "
 					+ "or exit test by pressing <font color = 'yellow'><b>Back</b></font> button on your cell phone\n<br />" + 
-					"<font color = 'red'><b>You will feel a short vibration when test start.</b></font>"))
+					"<font color = 'red'><b>You will have 3 seconds to get ready after you press Start.</b></font>"))
 					.setCancelable(false)
 					.setPositiveButton("OK", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -461,8 +423,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 //					pauseOrResume();
 					stopTest();
 					timer.cancel();
-					controlBtn.setText("Start");
-					HandTremorTestActivity.this.leave();
+					FingerTappingTestActivity.this.leave();
 				}
 			})
 			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

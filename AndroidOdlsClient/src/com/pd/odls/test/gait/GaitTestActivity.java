@@ -17,6 +17,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +30,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -41,6 +47,7 @@ import com.pd.odls.model.Test;
 import com.pd.odls.model.User;
 import com.pd.odls.sqlite.OdlsDbAdapter;
 import com.pd.odls.test.BaseTestActivity;
+import com.pd.odls.test.DrawPattern;
 import com.pd.odls.test.MotionSensingThread;
 import com.pd.odls.util.SupportingUtils;
 
@@ -240,6 +247,39 @@ public class GaitTestActivity extends BaseTestActivity {
 					this, 
 					handler);	
 		}
+		
+		//set DrawMotionTrace interface for test thread, which decouple the DrawMotionTrace with testThread.
+		((MotionSensingThread)testThread).setDrawMotionTrace(new DrawPattern() {
+			
+			public void draw(Canvas canvas) {
+				SurfaceHolder surfaceHolder = testPanel.getHolder();
+				try {
+					canvas = surfaceHolder.lockCanvas();
+					synchronized (surfaceHolder) {
+						//add moving object position to motion trace, which is stored in ArrayList tracePoints
+						canvas.drawColor(Color.WHITE);
+						
+						Paint paint = new Paint();
+						paint.setColor(Color.BLUE);
+						paint.setStrokeWidth(2);
+						paint.setStyle(Paint.Style.STROKE);
+
+						Point[] pts = ((MotionSensingThread)testThread).getTracePoints().
+								toArray(new Point[((MotionSensingThread)testThread).getTracePoints().size()]);
+						Path path = new Path();
+						path.moveTo(pts[0].x, pts[0].y);
+						for (int i = 1; i < pts.length; i++){
+							path.lineTo(pts[i].x, pts[i].y);
+						}
+						canvas.drawPath(path, paint);
+					}
+				}
+				finally {
+					if(canvas != null)
+						surfaceHolder.unlockCanvasAndPost(canvas);
+				}						
+			}				
+		});
 		
 		//initialize count down timer task before task beginning, initialize 5 seconds.
 		this.setCountDownTask(new CountDownTimerTask(5, handler));

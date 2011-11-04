@@ -14,10 +14,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.pd.odls.R;
+import com.pd.odls.test.finger.FingerTappingTestActivity;
 import com.pd.odls.test.gait.GaitTestActivity;
 import com.pd.odls.test.handtremor.HandTremorTestActivity;
 import com.pd.odls.test.legtremor.LegTremorTestActivity;
-import com.pd.odls.test.tapping.TappingTestActivity;
 
 public class TestListActivity extends ListActivity {
 
@@ -54,7 +54,7 @@ public class TestListActivity extends ListActivity {
 			i = new Intent(this, GaitTestActivity.class);
 			break;
 		case 2:
-			i = new Intent(this, TappingTestActivity.class);
+			i = new Intent(this, FingerTappingTestActivity.class);
 			break;
 		case 3:
 			i = new Intent(this, LegTremorTestActivity.class);
