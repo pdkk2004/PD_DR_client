@@ -12,10 +12,10 @@ import com.pd.odls.test.MotionSensingThread;
 public class LegTremorTestThread extends MotionSensingThread {
 
 	public LegTremorTestThread(BaseTestPanel testPanel,
-			SurfaceHolder surfaceHolder, DataOutputStream dout,
+			SurfaceHolder surfaceHolder, DataOutputStream doutAcc,
+			DataOutputStream doutOri,
 			Context context, Handler handler) {
-		
-		super(testPanel, surfaceHolder, dout, context, handler);
+		super(testPanel, surfaceHolder, doutAcc, doutOri, context, handler);
 	}
 	
 }	

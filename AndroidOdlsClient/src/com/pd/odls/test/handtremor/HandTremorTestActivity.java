@@ -69,8 +69,11 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	//Create the timer task to count down time before test begin
 	private CountDownTimerTask countDownTask;
 	
-	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
-	private DataOutputStream dout;
+	private ByteArrayOutputStream bufferAcc = new ByteArrayOutputStream();  //create the buffer to store acceleration data
+	private ByteArrayOutputStream bufferOri = new ByteArrayOutputStream();  //create the buffer to store orientation data
+	
+	private DataOutputStream doutAcc;
+	private DataOutputStream doutOri;
 	
 	private OdlsDbAdapter databaseManager;
 	
@@ -99,7 +102,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				controlBtn.setText("Start");
 				showDialog(HandTremorTestActivity.DLG_BUFFER_FULL);
 				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferAcc.toByteArray()));
 				try {
 					while(true) {
 						System.out.print(din.readFloat() + " ");
@@ -193,7 +196,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		databaseManager = new OdlsDbAdapter(this);
 		
 		//initialize DataOutputStream to store sensed data
-		this.dout = new DataOutputStream(buffer);
+		this.doutAcc = new DataOutputStream(bufferAcc);
+		this.doutOri = new DataOutputStream(bufferOri);
 	}
 	
 	@Override
@@ -229,7 +233,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	@Override
 	protected void initializeTest() {
 		//Reset buffer to empty
-		buffer.reset();
+		bufferAcc.reset();
+		bufferOri.reset();
 		
 		//Reset isRunning to false
 		isRunning = false;
@@ -239,7 +244,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
 			testThread = new HandTremorTestThread(testPanel, 
 					testPanel.getHolder(), 
-					dout,
+					doutAcc,
+					doutOri,
 					this, 
 					handler);
 			
@@ -445,7 +451,8 @@ public class HandTremorTestActivity extends BaseTestActivity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							buffer.reset();
+							bufferAcc.reset();
+							bufferOri.reset();
 						}
 					});
 			dialog = builder.create();
@@ -490,9 +497,10 @@ public class HandTremorTestActivity extends BaseTestActivity {
 			}
 		}
 				
-		byte[] data = buffer.toByteArray();
+		byte[] data1 = bufferAcc.toByteArray();
+		byte[] data2 = bufferOri.toByteArray();
 
-		int samplePoints = data.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
+		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
 		
@@ -507,11 +515,13 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				data
+				data1,
+				data2
 		);
 				
 		//clear buffer for next use
-		buffer.reset();
+		bufferAcc.reset();
+		bufferOri.reset();
 		return true;
 	}
 

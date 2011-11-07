@@ -12,9 +12,9 @@ import com.pd.odls.test.MotionSensingThread;
 public class GaitTestTread extends MotionSensingThread {
 
 	public GaitTestTread(BaseTestPanel testPanel, SurfaceHolder surfaceHolder,
-			DataOutputStream dout, Context context, Handler handler) {
+			DataOutputStream doutAcc, DataOutputStream doutOri, Context context, Handler handler) {
 		
-		super(testPanel, surfaceHolder, dout, context, handler);
+		super(testPanel, surfaceHolder, doutAcc, doutOri, context, handler);
 	}
 
 }

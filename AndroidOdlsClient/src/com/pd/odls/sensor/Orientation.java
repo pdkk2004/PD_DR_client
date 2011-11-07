@@ -1,4 +1,4 @@
-package com.pd.odls.accelorator;
+package com.pd.odls.sensor;
 
 import java.util.List;
 
@@ -9,10 +9,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
-public class Accelerometer {
+public class Orientation {
 	
     private Context CONTEXT;
-    private AccelerometerDelegate accelerometerDelegate;
+    private SensorDelegate orientationDelegate;
     private SensorManager sensorManager;
     private float threshold = 0.2f;      //default value of threshold
     private int interval = 1000;         //default value of interval
@@ -65,7 +65,7 @@ public class Accelerometer {
         			if (force > threshold) {
         				if (now - lastShake >= interval) {
         					// trigger shake event
-        					accelerometerDelegate.onShake(force);
+        					orientationDelegate.onShake(force);
         				}
         				lastShake = now;
         			}
@@ -75,16 +75,16 @@ public class Accelerometer {
         			lastUpdate = now;
         		}
         	}
-        	if(accelerometerDelegate != null)
-        		accelerometerDelegate.onAccelerationChanged(x, y, z);
+//        	if(gyroScopeDelegate != null)
+//        		gyroScopeDelegate.onSensedValueChanged(event);
         }
     };
          
-    public Accelerometer(Context context) {
+    public Orientation(Context context) {
 		super();
 		CONTEXT = context;
 		sensor = getSensor(context);
-		accelerometerDelegate = null;
+		orientationDelegate = null;
 		handler = null;
 	}
     
@@ -95,7 +95,7 @@ public class Accelerometer {
 			getSystemService(Context.SENSOR_SERVICE);
 
     	List<Sensor> sensors = sensorManager.getSensorList(
-    			Sensor.TYPE_ACCELEROMETER);
+    			Sensor.TYPE_ORIENTATION);
     	if (sensors.size() > 0) {
     		s = sensors.get(0);
     	}
@@ -144,16 +144,16 @@ public class Accelerometer {
 		this.sensorManager = sensorManager;
 	}
 
-	public void setAccelerometerDelegate(AccelerometerDelegate delegate) {
-		this.accelerometerDelegate = delegate;
+	public void setDelegate(SensorDelegate delegate) {
+		this.orientationDelegate = delegate;
 	}
 	
-	public void removeRegistryAccelerometerDelegate() {
-		accelerometerDelegate = null;
+	public void removeDelegate() {
+		orientationDelegate = null;
 	}
 
 	public boolean start() {
-		if(accelerometerDelegate != null) {
+		if(orientationDelegate != null) {
 			running = true;
 			sensorManager.registerListener(sensorListener, sensor, rate, handler);			
 		}
@@ -163,7 +163,7 @@ public class Accelerometer {
     }
  
     public void stop() {
-    	if(running == true && accelerometerDelegate != null) {
+    	if(running == true && orientationDelegate != null) {
     		running = false;
     		sensorManager.unregisterListener(sensorListener, sensor);
     	}

@@ -468,7 +468,8 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				data
+				data,
+				null
 		);
 				
 		//clear buffer for next use

@@ -12,9 +12,10 @@ import com.pd.odls.test.MotionSensingThread;
 public class HandTremorTestThread extends MotionSensingThread {
 
 	public HandTremorTestThread(BaseTestPanel testPanel,
-			SurfaceHolder surfaceHolder, DataOutputStream dout,
+			SurfaceHolder surfaceHolder, DataOutputStream doutAcc,
+			DataOutputStream doutOri,
 			Context context, Handler handler) {
-		super(testPanel, surfaceHolder, dout, context, handler);
+		super(testPanel, surfaceHolder, doutAcc, doutOri, context, handler);
 		// TODO Auto-generated constructor stub
 	}
 	

@@ -24,7 +24,8 @@ public class OdlsOpenDbHelper extends SQLiteOpenHelper  {
 			+ "explanation text,"
 			+ "sample_rate integer,"
 			+ "scale integer,"
-			+ "data blob);";
+			+ "data1 blob,"
+			+ "data2 blob);";
 	
 	//TODO: Uncomment this table create command if Patients table needed.
 //	private static final String CREATE_PATIENT_TABLE = "CREATE TABLE IF NOT EXISTS patients" +

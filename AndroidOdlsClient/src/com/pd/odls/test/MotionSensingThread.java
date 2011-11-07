@@ -4,6 +4,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.openintents.sensorsimulator.hardware.SensorEvent;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,8 +16,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.pd.odls.accelorator.AccelerometerDelegate;
-import com.pd.odls.accelorator.SimulatedAccelerometer;
+import com.pd.odls.sensor.Accelerometer;
+import com.pd.odls.sensor.Orientation;
+import com.pd.odls.sensor.SensorDelegate;
 
 public class MotionSensingThread extends BaseTestThread {
 	
@@ -30,22 +33,27 @@ public class MotionSensingThread extends BaseTestThread {
 	private DrawPattern drawMotionTrace;
 	
 	//TODO change SimulatedAccelerometer to Accelerometer in production
-//	private Accelerometer accelerometer;
-	private SimulatedAccelerometer accelerometer;
+	private Accelerometer accelerometer;
+	private Orientation orientation;
+//	private SimulatedAccelerometer accelerometer;
+//	private SimulatedOrientation orientation;
 	
-	private DataOutputStream dout;
+	private DataOutputStream doutAcc;
+	private DataOutputStream doutOri;
 	
 	@SuppressWarnings("unused")
 	private Handler handler;
 	
 	public MotionSensingThread(BaseTestPanel testPanel,
-			SurfaceHolder surfaceHolder, DataOutputStream dout, Context context, Handler handler) {
+			SurfaceHolder surfaceHolder, DataOutputStream doutAcc, DataOutputStream doutOri,
+			Context context, Handler handler) {
 		super(testPanel, surfaceHolder);
 		this.offSetX = 0;
 		this.offSetY = 0;
 		this.offSetZ = 0;
 		this.context = context;
-		this.dout = dout;
+		this.doutAcc = doutAcc;
+		this.doutOri = doutOri;
 		this.handler = handler;
 	}
 	
@@ -53,28 +61,65 @@ public class MotionSensingThread extends BaseTestThread {
 	public void initializeAccelerometer() {
 		if(context != null) {
 			//TODO change SimulatedAccelerometer to Accelerometer in production			
-//			accelerometer = new Accelerometer(this.context);
-			accelerometer = new SimulatedAccelerometer(this.context);
+			accelerometer = new Accelerometer(this.context);
+			orientation = new Orientation(this.context);
 			
-			accelerometer.setAccelerometerDelegate(delegate);
+//			accelerometer = new SimulatedAccelerometer(this.context);
+//			orientation = new SimulatedOrientation(this.context);
+			
+			orientation.setDelegate(delegateOri);
+			accelerometer.setDelegate(delegateAcc);
 		}
 	}
 	
 	/**
 	 * Delegate operation to deal with sensed data from accelerometer sensor
 	 */
-	private AccelerometerDelegate delegate = new AccelerometerDelegate() {
+	private SensorDelegate delegateAcc = new SensorDelegate() {
 
-		public void onAccelerationChanged(float x, float y, float z) {
+		public void onSensedValueChanged(SensorEvent event) {
 			try {
+				float x = event.values[0];
+				float y = event.values[1];
+				float z = event.values[2];
 				offSetX = Math.round(x);
 				offSetY = Math.round(y);
 				offSetZ = Math.round(z);
-				dout.writeFloat(x);
-				dout.writeFloat(y);
-				dout.writeFloat(z - (float)9.98);
-				dout.flush();
+				doutAcc.writeFloat(x);
+				doutAcc.writeFloat(y);
+				doutAcc.writeFloat(z - (float)9.98);
+				doutAcc.flush();
 				System.out.println("Acceleration:" + x + " " + y + " " + z);
+			}
+			catch(IOException e) {
+				Log.e(this.getClass().getName(), e.getMessage());
+			}		
+		}
+
+		public void onShake(float force) {
+			
+		}
+		
+	};
+	
+	/**
+	 * Delegate operation to deal with sensed data from accelerometer sensor
+	 */
+	private SensorDelegate delegateOri = new SensorDelegate() {
+
+		public void onSensedValueChanged(SensorEvent event) {
+			try {
+				float x = event.values[0];
+				float y = event.values[1];
+				float z = event.values[2];
+				offSetX = Math.round(x);
+				offSetY = Math.round(y);
+				offSetZ = Math.round(z);
+				doutOri.writeFloat(x);
+				doutOri.writeFloat(y);
+				doutOri.writeFloat(z);
+				doutOri.flush();
+				System.out.println("Orientation:" + x + " " + y + " " + z);
 			}
 			catch(IOException e) {
 				Log.e(this.getClass().getName(), e.getMessage());
@@ -134,10 +179,14 @@ public class MotionSensingThread extends BaseTestThread {
 		if(accelerometer == null)
 			initializeAccelerometer();
 		if(accelerometer != null) {
-			if(isRunning)
+			if(isRunning) {
 				accelerometer.start();
-			else
+				orientation.start();
+			}
+			else {
 				accelerometer.stop();
+				orientation.stop();
+			}
 		}	
 	}
 
@@ -145,10 +194,14 @@ public class MotionSensingThread extends BaseTestThread {
 	public void changePauseStatus() {
 		super.changePauseStatus();
 		if(accelerometer != null) {
-			if(!paused)
+			if(!paused) {
 				accelerometer.start();
-			else
+				orientation.start();
+			}
+			else {
 				accelerometer.stop();
+				orientation.stop();
+			}
 		}
 	}
 	

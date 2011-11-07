@@ -1,4 +1,4 @@
-package com.pd.odls.accelorator;
+package com.pd.odls.sensor;
 
 import org.openintents.sensorsimulator.hardware.Sensor;
 import org.openintents.sensorsimulator.hardware.SensorEvent;
@@ -8,16 +8,15 @@ import org.openintents.sensorsimulator.hardware.SensorManagerSimulator;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Handler;
-import android.util.Log;
 
 public class SimulatedAccelerometer {
 	
     private Context CONTEXT;
-    private AccelerometerDelegate accelerometerDelegate;
+    private SensorDelegate accelerometerDelegate;
     private SensorManagerSimulator sensorManager;
     private float threshold = 0.2f;      //default value of threshold
     private int interval = 1000;         //default value of interval
-    private int rate = SensorManager.SENSOR_DELAY_GAME;   
+    private int rate = SensorManager.SENSOR_DELAY_FASTEST;   
     private Handler handler;
     
 	private Sensor sensor;
@@ -25,24 +24,23 @@ public class SimulatedAccelerometer {
     private String elapsedTime;
     
     private SensorEventListener sensorListener = new SensorEventListener() { 
-        private float x = 0;
-        private float y = 0;
-        private float z = 0;
- 
+
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
  
         public void onSensorChanged(SensorEvent event) {
+        	System.out.println("Acceleration sensor on");
+
         	// use the event timestamp as reference
         	// so the manager precision won't depends 
         	// on the AccelerometerListener implementation
         	// processing time
 
-        	x = event.values[0];
-        	y = event.values[1];
-        	z = event.values[2];
-        	
-        	elapsedTime = event.time;
-        	Log.d(this.getClass().getName(), elapsedTime);
+//        	x = event.values[0];
+//        	y = event.values[1];
+//        	z = event.values[2];
+//        	
+//        	elapsedTime = event.time;
+//        	Log.d(this.getClass().getName(), elapsedTime);
 
         	// if not interesting in shake events
         	// just remove the whole if then else bloc
@@ -71,7 +69,7 @@ public class SimulatedAccelerometer {
 //        		}
 //        	}
         	if(accelerometerDelegate != null)
-        		accelerometerDelegate.onAccelerationChanged(x, y, z);
+        		accelerometerDelegate.onSensedValueChanged(event);
         }
     };
          
@@ -92,8 +90,7 @@ public class SimulatedAccelerometer {
     	s = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     	return s;
     }
-    
-    
+          
 
 	public Handler getHandler() {
 		return handler;
@@ -135,11 +132,11 @@ public class SimulatedAccelerometer {
 		this.sensorManager = sensorManager;
 	}
 
-	public void setAccelerometerDelegate(AccelerometerDelegate delegate) {
+	public void setDelegate(SensorDelegate delegate) {
 		this.accelerometerDelegate = delegate;
 	}
 	
-	public void removeRegistryAccelerometerDelegate() {
+	public void removeDelegate() {
 		accelerometerDelegate = null;
 	}
 

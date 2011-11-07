@@ -65,8 +65,6 @@ public class FingerTappingTestThread extends BaseTestThread {
 				}
 			}
 			
-			
-
 			finally {
 				if(canvas != null)
 					surfaceHolder.unlockCanvasAndPost(canvas);

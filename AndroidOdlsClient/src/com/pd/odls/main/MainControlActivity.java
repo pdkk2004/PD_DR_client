@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.TabHost;
 
 import com.pd.odls.R;
-import com.pd.odls.scale.FallsEvaluationActivity;
 import com.pd.odls.testlist.TestHistoryListActivity;
 import com.pd.odls.testlist.TestListActivity;
 
@@ -32,7 +31,8 @@ public class MainControlActivity extends TabActivity {
 	    tabHost.addTab(spec);
 	    
 	    //bind falls efficacy scale evaluation to tab_2
-		intent = new Intent().setClass(this, FallsEvaluationActivity.class);
+		intent = new Intent(android.content.Intent.ACTION_SEND);
+		intent.setType("plain/text");
 	    spec = tabHost.newTabSpec("Message")
 	    		.setIndicator("Messages", res.getDrawable(R.drawable.tab_icon_selector))
 	    		.setContent(intent);    
