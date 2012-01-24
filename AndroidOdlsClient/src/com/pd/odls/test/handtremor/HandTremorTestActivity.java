@@ -56,25 +56,27 @@ public class HandTremorTestActivity extends BaseTestActivity {
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
 	
-	//UI components
+	//Declare UI components
 	private Button controlBtn;
 	private TextView elapsedTimeView;
 	protected ProgressDialog countDownDlg;
 
-	//Create the timer task to count test elapsed time
+	//Declare the timer task to count test elapsed time
 	private TimerTask timerTask;	
 	private Timer timer;
 	private int elapsedTime;
 	
-	//Create the timer task to count down time before test begin
+	//Declare the timer task to count down time before test begin
 	private CountDownTimerTask countDownTask;
 	
+	//Declare buffer and iostream for collected motion data
 	private ByteArrayOutputStream bufferAcc = new ByteArrayOutputStream();  //create the buffer to store acceleration data
 	private ByteArrayOutputStream bufferOri = new ByteArrayOutputStream();  //create the buffer to store orientation data
 	
 	private DataOutputStream doutAcc;
 	private DataOutputStream doutOri;
 	
+	//Declare Database adapter
 	private OdlsDbAdapter databaseManager;
 	
 	private int testType;
@@ -236,7 +238,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		bufferAcc.reset();
 		bufferOri.reset();
 		
-		//Reset isRunning to false
+		//Reset isRunning and pause flags to false
 		isRunning = false;
 		pause = false;
 		
@@ -519,7 +521,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 				data2
 		);
 				
-		//clear buffer for next use
+		//clean buffer for next use
 		bufferAcc.reset();
 		bufferOri.reset();
 		return true;

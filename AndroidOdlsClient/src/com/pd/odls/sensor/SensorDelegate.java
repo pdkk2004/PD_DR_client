@@ -1,6 +1,6 @@
 package com.pd.odls.sensor;
 
-import org.openintents.sensorsimulator.hardware.SensorEvent;
+
 
 /**
  * Accelerometer delegate to process accelerometer data. Aimed to be implemented.
@@ -9,7 +9,7 @@ import org.openintents.sensorsimulator.hardware.SensorEvent;
  */
 public interface SensorDelegate {
 	
-	public void onSensedValueChanged(SensorEvent event);
+	public void onSensedValueChanged(float x, float y, float z);
 	 
 	public void onShake(float force);
 

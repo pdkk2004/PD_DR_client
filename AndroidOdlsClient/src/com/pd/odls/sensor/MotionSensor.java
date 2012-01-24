@@ -9,60 +9,86 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
-public class Orientation {
+public class MotionSensor {
 	
     private Context CONTEXT;
     private SensorDelegate orientationDelegate;
+    private SensorDelegate accelerationDelegate;
     private SensorManager sensorManager;
     private float threshold = 0.2f;      //default value of threshold
     private int interval = 1000;         //default value of interval
     private int rate = SensorManager.SENSOR_DELAY_FASTEST;   
     private Handler handler;
     
-	private Sensor sensor;
+	private Sensor sensorAcc;
+	private Sensor sensorMeg;
+	
     private boolean running;
-    
+     
     private SensorEventListener sensorListener = new SensorEventListener() {
+        private float[] mGravity;
+        float[] mGeomagnetic;      
+ 
         private float x = 0;
         private float y = 0;
         private float z = 0;
-
+ 
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
  
         public void onSensorChanged(SensorEvent event) {
-        	x = event.values[0];
-        	y = event.values[1];
-        	z = event.values[2];
 
-        	if(orientationDelegate != null)
-        		orientationDelegate.onSensedValueChanged(x, y, z);
+        	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        		mGravity = event.values;
+        		if(accelerationDelegate != null)
+        			accelerationDelegate.onSensedValueChanged(mGravity[0],
+        					mGravity[1],
+        					mGravity[2]);
+        	}
+        	
+        	if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+        		mGeomagnetic = event.values;
+        	
+        	if (mGravity != null && mGeomagnetic != null) {
+        		float R[] = new float[9];
+        		float I[] = new float[9];
+        		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+        		if (success) {
+        			float orientation[] = new float[3]; 
+        			SensorManager.getOrientation(R, orientation); 
+        			x = orientation[0]; // orientation azimut
+        			y = orientation[1]; // orientation pitch
+        			z = orientation[2]; // orientation roll
+                	if(orientationDelegate != null)
+                		orientationDelegate.onSensedValueChanged(x, y, z);
+        		}
+        	}
+
         }
     };
          
-    public Orientation(Context context) {
+    public MotionSensor(Context context) {
 		super();
 		CONTEXT = context;
-		sensor = getSensor(context);
+		sensorAcc = getSensor(context, Sensor.TYPE_ACCELEROMETER);
+		sensorMeg = getSensor(context, Sensor.TYPE_MAGNETIC_FIELD);
 		orientationDelegate = null;
 		handler = null;
 	}
     
-    private Sensor getSensor(Context context) {
+    private Sensor getSensor(Context context, int type) {
     	Sensor s = null;
     	
     	sensorManager = (SensorManager)CONTEXT.
 			getSystemService(Context.SENSOR_SERVICE);
 
-    	List<Sensor> sensors = sensorManager.getSensorList(
-    			Sensor.TYPE_ORIENTATION);
+    	List<Sensor> sensors = sensorManager.getSensorList(type);
     	if (sensors.size() > 0) {
     		s = sensors.get(0);
     	}
     	return s;
     }
     
-    
-
+ 
 	public Handler getHandler() {
 		return handler;
 	}
@@ -103,18 +129,27 @@ public class Orientation {
 		this.sensorManager = sensorManager;
 	}
 
-	public void setDelegate(SensorDelegate delegate) {
+	public void setOriDelegate(SensorDelegate delegate) {
 		this.orientationDelegate = delegate;
+	}
+	
+	public void setAccDelegate(SensorDelegate delegate) {
+		this.accelerationDelegate = delegate;
 	}
 	
 	public void removeDelegate() {
 		orientationDelegate = null;
+		accelerationDelegate = null;
 	}
 
 	public boolean start() {
 		if(orientationDelegate != null) {
 			running = true;
-			sensorManager.registerListener(sensorListener, sensor, rate, handler);			
+			sensorManager.registerListener(sensorListener, sensorMeg, rate, handler);			
+		}
+		if(accelerationDelegate != null) {
+			running = true;
+			sensorManager.registerListener(sensorListener, sensorAcc, rate, handler);						
 		}
 		else running = false;
 		return running;
@@ -122,9 +157,12 @@ public class Orientation {
     }
  
     public void stop() {
-    	if(running == true && orientationDelegate != null) {
+    	if(running == true) {
     		running = false;
-    		sensorManager.unregisterListener(sensorListener, sensor);
+    		if(orientationDelegate != null)
+        		sensorManager.unregisterListener(sensorListener, sensorMeg);    		
+    		if(accelerationDelegate != null)
+    			sensorManager.unregisterListener(sensorListener, sensorAcc);
     	}
     }
     

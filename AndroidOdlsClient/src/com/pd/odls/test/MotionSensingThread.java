@@ -4,8 +4,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.openintents.sensorsimulator.hardware.SensorEvent;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,8 +14,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.pd.odls.sensor.Accelerometer;
-import com.pd.odls.sensor.Orientation;
+import com.pd.odls.sensor.MotionSensor;
 import com.pd.odls.sensor.SensorDelegate;
 
 public class MotionSensingThread extends BaseTestThread {
@@ -32,11 +29,13 @@ public class MotionSensingThread extends BaseTestThread {
 	
 	private DrawPattern drawMotionTrace;
 	
+	//TODO delete following two lines for running on device
+//	private Accelerometer accelerometer;     //do not need any more
+//	private SimulatedAccelerometer accelerometer;   //do not need any more
+	
 	//TODO change SimulatedAccelerometer to Accelerometer in production
-	private Accelerometer accelerometer;
-	private Orientation orientation;
-//	private SimulatedAccelerometer accelerometer;
-//	private SimulatedOrientation orientation;
+	private MotionSensor motionSensor;
+//	private SimulatedMotionSensor motionSensor;
 	
 	private DataOutputStream doutAcc;
 	private DataOutputStream doutOri;
@@ -57,18 +56,27 @@ public class MotionSensingThread extends BaseTestThread {
 		this.handler = handler;
 	}
 	
-	@Override
-	public void initializeAccelerometer() {
-		if(context != null) {
-			//TODO change SimulatedAccelerometer to Accelerometer in production			
-			accelerometer = new Accelerometer(this.context);
-			orientation = new Orientation(this.context);
-			
+	
+	//TODO Do not need any more, can delete
+//	@Override
+//	public void initializeAccelerometer() {
+//		if(context != null) {
+//			//TODO change SimulatedAccelerometer to Accelerometer in production			
+//			accelerometer = new Accelerometer(this.context);			
 //			accelerometer = new SimulatedAccelerometer(this.context);
-//			orientation = new SimulatedOrientation(this.context);
-			
-			orientation.setDelegate(delegateOri);
-			accelerometer.setDelegate(delegateAcc);
+//			
+//			accelerometer.setDelegate(delegateAcc);
+//		}
+//	}
+	
+	public void initializeSensor() {
+		if(context != null) {
+			//TODO change SimulatedOrientation to Orientation in production			
+			motionSensor = new MotionSensor(this.context);	
+//			motionSensor = new SimulatedMotionSensor(this.context);
+		
+			motionSensor.setAccDelegate(delegateAcc);
+			motionSensor.setOriDelegate(delegateOri);
 		}
 	}
 	
@@ -77,11 +85,8 @@ public class MotionSensingThread extends BaseTestThread {
 	 */
 	private SensorDelegate delegateAcc = new SensorDelegate() {
 
-		public void onSensedValueChanged(SensorEvent event) {
+		public void onSensedValueChanged(float x, float y, float z) {
 			try {
-				float x = event.values[0];
-				float y = event.values[1];
-				float z = event.values[2];
 				offSetX = Math.round(x);
 				offSetY = Math.round(y);
 				offSetZ = Math.round(z);
@@ -107,14 +112,8 @@ public class MotionSensingThread extends BaseTestThread {
 	 */
 	private SensorDelegate delegateOri = new SensorDelegate() {
 
-		public void onSensedValueChanged(SensorEvent event) {
+		public void onSensedValueChanged(float x, float y, float z) {
 			try {
-				float x = event.values[0];
-				float y = event.values[1];
-				float z = event.values[2];
-				offSetX = Math.round(x);
-				offSetY = Math.round(y);
-				offSetZ = Math.round(z);
 				doutOri.writeFloat(x);
 				doutOri.writeFloat(y);
 				doutOri.writeFloat(z);
@@ -176,33 +175,52 @@ public class MotionSensingThread extends BaseTestThread {
 	@Override
 	public void setRunning(boolean running) {
 		super.setRunning(running);
-		if(accelerometer == null)
-			initializeAccelerometer();
-		if(accelerometer != null) {
+//		if(accelerometer == null)
+//			initializeAccelerometer();
+		if(motionSensor == null)
+			initializeSensor();
+		
+//		if(accelerometer != null) {
+//			if(isRunning) {
+//				accelerometer.start();
+//			}
+//			else {
+//				accelerometer.stop();
+//			}
+//		}
+		
+		if(motionSensor != null) {
 			if(isRunning) {
-				accelerometer.start();
-				orientation.start();
+				motionSensor.start();
 			}
 			else {
-				accelerometer.stop();
-				orientation.stop();
+				motionSensor.stop();
 			}
-		}	
+		}
+		
 	}
 
 	@Override
 	public void changePauseStatus() {
 		super.changePauseStatus();
-		if(accelerometer != null) {
+//		if(accelerometer != null) {
+//			if(!paused) {
+//				accelerometer.start();
+//			}
+//			else {
+//				accelerometer.stop();
+//			}
+//		}
+		
+		if(motionSensor != null) {
 			if(!paused) {
-				accelerometer.start();
-				orientation.start();
+				motionSensor.start();
 			}
 			else {
-				accelerometer.stop();
-				orientation.stop();
+				motionSensor.stop();
 			}
 		}
+		
 	}
 	
 	/**

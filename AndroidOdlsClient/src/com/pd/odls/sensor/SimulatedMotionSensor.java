@@ -9,21 +9,27 @@ import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
-public class SimulatedOrientation {
+public class SimulatedMotionSensor {
 	
     private Context CONTEXT;
     private SensorDelegate orientationDelegate;
+    private SensorDelegate accelerationDelegate;
     private SensorManagerSimulator sensorManager;
     private float threshold = 0.2f;      //default value of threshold
     private int interval = 1000;         //default value of interval
     private int rate = SensorManager.SENSOR_DELAY_FASTEST;   
     private Handler handler;
     
-	private Sensor sensor;
+	private Sensor sensorAcc;
+	private Sensor sensorMeg;
+	
     private boolean running;
     private String elapsedTime;
     
     private SensorEventListener sensorListener = new SensorEventListener() { 
+ 
+        private float[] mGravity;
+        float[] mGeomagnetic;    
         
     	private float x = 0;
         private float y = 0;
@@ -33,64 +39,51 @@ public class SimulatedOrientation {
  
         public void onSensorChanged(SensorEvent event) {
         	System.out.println("Orientation sensor on");
-        	// use the event timestamp as reference
-        	// so the manager precision won't depends 
-        	// on the AccelerometerListener implementation
-        	// processing time
 
-        	x = event.values[0];
-        	y = event.values[1];
-        	z = event.values[2];
-//        	
-//        	elapsedTime = event.time;
-//        	Log.d(this.getClass().getName(), elapsedTime);
-
-        	// if not interesting in shake events
-        	// just remove the whole if then else bloc
-//        	if (lastUpdate == 0) {
-//        		lastUpdate = now;
-//        		lastShake = now;
-//        		lastX = x;
-//        		lastY = y;
-//        		lastZ = z;
-//        	} else {
-//        		timeDiff = now - lastUpdate;
-//        		if (timeDiff > 0) {
-//        			force = Math.abs(x + y + z - lastX - lastY - lastZ) 
-//        			/ timeDiff;
-//        			if (force > threshold) {
-//        				if (now - lastShake >= interval) {
-//        					// trigger shake event
-//        					accelerometerDelegate.onShake(force);
-//        				}
-//        				lastShake = now;
-//        			}
-//        			lastX = x;
-//        			lastY = y;
-//        			lastZ = z;
-//        			lastUpdate = now;
-//        		}
-//        	}
-        	if(orientationDelegate != null)
-        		orientationDelegate.onSensedValueChanged(x, y, z);
+        	if (event.type == Sensor.TYPE_ACCELEROMETER) {
+        		mGravity = event.values;
+        		if(accelerationDelegate != null) {
+        			accelerationDelegate.onSensedValueChanged(mGravity[0],
+        					mGravity[1],
+        					mGravity[2]);
+        		}
+        	}
+        	if (event.type == Sensor.TYPE_MAGNETIC_FIELD)
+        		mGeomagnetic = event.values;
+        	
+        	if (mGravity != null && mGeomagnetic != null) {
+        		float R[] = new float[9];
+        		float I[] = new float[9];
+        		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+        		if (success) {
+        			float orientation[] = new float[3]; 
+        			SensorManager.getOrientation(R, orientation); 
+        			x = orientation[0]; // orientation azimut
+        			y = orientation[1]; // orientation pitch
+        			z = orientation[2]; // orientation roll
+                	if(orientationDelegate != null)
+                		orientationDelegate.onSensedValueChanged(x, y, z);
+        		}
+        	}
         }
     };
          
-    public SimulatedOrientation(Context context) {
+    public SimulatedMotionSensor(Context context) {
 		super();
 		CONTEXT = context;
-		sensor = getSensor(context);
+		sensorAcc = getSensor(context, Sensor.TYPE_ACCELEROMETER);
+		sensorMeg = getSensor(context, Sensor.TYPE_MAGNETIC_FIELD);
 		orientationDelegate = null;
 		handler = null;
 	}
     
-    private Sensor getSensor(Context context) {
+    private Sensor getSensor(Context context, int type) {
     	Sensor s = null;
     	
     	sensorManager = SensorManagerSimulator.getSystemService(context, Context.SENSOR_SERVICE);
     	sensorManager.connectSimulator();
 
-    	s = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+    	s = sensorManager.getDefaultSensor(type);
     	return s;
     }
     
@@ -134,18 +127,26 @@ public class SimulatedOrientation {
 		this.sensorManager = sensorManager;
 	}
 
-	public void setDelegate(SensorDelegate delegate) {
+	public void setOriDelegate(SensorDelegate delegate) {
 		this.orientationDelegate = delegate;
+	}
+	
+	public void setAccDelegate(SensorDelegate delegate) {
+		this.accelerationDelegate = delegate;
 	}
 	
 	public void removeDelegate() {
 		orientationDelegate = null;
 	}
 
-	public boolean start() {
-		if(orientationDelegate != null && sensor != null) {
+	public boolean start() {		
+		if(orientationDelegate != null) {
 			running = true;
-			sensorManager.registerListener(sensorListener, sensor, rate);
+			sensorManager.registerListener(sensorListener, sensorMeg, rate);			
+		}
+		if(accelerationDelegate != null) {
+			running = true;
+			sensorManager.registerListener(sensorListener, sensorAcc, rate);						
 		}
 		else running = false;
 		return running;
@@ -153,9 +154,12 @@ public class SimulatedOrientation {
     }
  
     public void stop() {
-    	if(running == true && orientationDelegate != null) {
+    	if(running == true) {
     		running = false;
-    		sensorManager.unregisterListener(sensorListener);
+    		if(orientationDelegate != null)
+        		sensorManager.unregisterListener(sensorListener, sensorMeg);    		
+    		if(accelerationDelegate != null)
+    			sensorManager.unregisterListener(sensorListener, sensorAcc);
     	}
     }
     

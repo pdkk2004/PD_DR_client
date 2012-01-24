@@ -9,6 +9,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
+/**
+ * Obsoleted. Used MotionSensor instead, which provides the acceleration and orientation
+ * monitoring. 
+ * @author Pan
+ *
+ */
 public class Accelerometer {
 	
     private Context CONTEXT;
@@ -22,61 +28,20 @@ public class Accelerometer {
 	private Sensor sensor;
     private boolean running;
     
-    private SensorEventListener sensorListener = new SensorEventListener() {
-        private long now = 0;
-        private long timeDiff = 0;
-        private long lastUpdate = 0;
-        private long lastShake = 0;
- 
+    private SensorEventListener sensorListener = new SensorEventListener() { 
         private float x = 0;
         private float y = 0;
         private float z = 0;
-        private float lastX = 0;
-        private float lastY = 0;
-        private float lastZ = 0;
-        private float force = 0;
  
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
  
         public void onSensorChanged(SensorEvent event) {
-        	// use the event timestamp as reference
-        	// so the manager precision won't depends 
-        	// on the AccelerometerListener implementation
-        	// processing time
-        	now = event.timestamp;
-
         	x = event.values[0];
         	y = event.values[1];
         	z = event.values[2];
-
-        	// if not interesting in shake events
-        	// just remove the whole if then else bloc
-        	if (lastUpdate == 0) {
-        		lastUpdate = now;
-        		lastShake = now;
-        		lastX = x;
-        		lastY = y;
-        		lastZ = z;
-        	} else {
-        		timeDiff = now - lastUpdate;
-        		if (timeDiff > 0) {
-        			force = Math.abs(x + y + z - lastX - lastY - lastZ) 
-        			/ timeDiff;
-        			if (force > threshold) {
-        				if (now - lastShake >= interval) {
-        					// trigger shake event
-        					accelerometerDelegate.onShake(force);
-        				}
-        				lastShake = now;
-        			}
-        			lastX = x;
-        			lastY = y;
-        			lastZ = z;
-        			lastUpdate = now;
-        		}
-        	}
-//        	if(accelerometerDelegate != null)
-//        		accelerometerDelegate.onSensedValueChanged(event);
+        	
+        	if(accelerometerDelegate != null)
+        		accelerometerDelegate.onSensedValueChanged(x, y, z);
         }
     };
          

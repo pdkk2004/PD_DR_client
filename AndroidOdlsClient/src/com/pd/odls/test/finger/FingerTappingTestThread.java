@@ -89,7 +89,7 @@ public class FingerTappingTestThread extends BaseTestThread {
 
 
 	@Override
-	public void initializeAccelerometer() {
+	public void initializeSensor() {
 		// TODO Leave blank do not need Accelerometer		
 	}
 	
