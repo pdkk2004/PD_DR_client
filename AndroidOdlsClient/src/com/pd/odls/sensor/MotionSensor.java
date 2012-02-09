@@ -24,7 +24,8 @@ public class MotionSensor {
 	private Sensor sensorMeg;
 	
     private boolean running;
-     
+    
+    //declare sensorListener to listen to motion sensor events
     private SensorEventListener sensorListener = new SensorEventListener() {
         private float[] mGravity;
         float[] mGeomagnetic;      
@@ -36,33 +37,38 @@ public class MotionSensor {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
  
         public void onSensorChanged(SensorEvent event) {
-
         	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            	
+        		//obtain translation acceleration
         		mGravity = event.values;
-        		if(accelerationDelegate != null)
+        		if(accelerationDelegate != null) {
         			accelerationDelegate.onSensedValueChanged(mGravity[0],
         					mGravity[1],
         					mGravity[2]);
-        	}
-        	
-        	if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-        		mGeomagnetic = event.values;
-        	
-        	if (mGravity != null && mGeomagnetic != null) {
-        		float R[] = new float[9];
-        		float I[] = new float[9];
-        		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
-        		if (success) {
-        			float orientation[] = new float[3]; 
-        			SensorManager.getOrientation(R, orientation); 
-        			x = orientation[0]; // orientation azimut
-        			y = orientation[1]; // orientation pitch
-        			z = orientation[2]; // orientation roll
-                	if(orientationDelegate != null)
-                		orientationDelegate.onSensedValueChanged(x, y, z);
         		}
+        		
+        		//obtain orientation acceleration
+            	if (mGravity != null && mGeomagnetic != null) {
+            		float R[] = new float[9];
+            		float I[] = new float[9];
+            		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            		if (success) {
+            			float orientation[] = new float[3]; 
+            			SensorManager.getOrientation(R, orientation); 
+            			x = orientation[0]; // orientation azimut
+            			y = orientation[1]; // orientation pitch
+            			z = orientation[2]; // orientation roll
+                    	if(orientationDelegate != null)
+                    		orientationDelegate.onSensedValueChanged(x, y, z);
+            		}
+            	}
+        	}        	
+        	else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+        		mGeomagnetic = event.values;
         	}
-
+        	else {
+        		
+        	}
         }
     };
          

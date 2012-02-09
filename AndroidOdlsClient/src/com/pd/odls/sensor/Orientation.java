@@ -60,9 +60,7 @@ public class Orientation {
     	}
     	return s;
     }
-    
-    
-
+        
 	public Handler getHandler() {
 		return handler;
 	}
