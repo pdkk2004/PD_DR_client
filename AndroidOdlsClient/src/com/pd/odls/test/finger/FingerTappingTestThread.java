@@ -22,19 +22,18 @@ public class FingerTappingTestThread extends BaseTestThread {
 	
 	private DrawPattern drawTappingTag;
 	
-	private DataOutputStream dout;
+	private DataOutputStream doutTime;
 	
 	@SuppressWarnings("unused")
 	private Handler handler;
 		
 
 	public FingerTappingTestThread(BaseTestPanel testPanel,
-			SurfaceHolder holder, DataOutputStream dout,
-			Context context,
-			Handler handler) {
+			SurfaceHolder holder, DataOutputStream doutTime,
+			Context context, Handler handler) {
 		super(testPanel, holder);
 		this.context = context;
-		this.dout = dout;
+		this.doutTime = doutTime;
 		this.handler = handler;		
 	}
 
@@ -63,17 +62,25 @@ public class FingerTappingTestThread extends BaseTestThread {
 					this.testPanel.update();
 					this.testPanel.render(canvas);
 				}
+				Log.i(TAG, "Target appears at:" + System.currentTimeMillis());
+				doutTime.writeLong(0);
+				doutTime.writeLong(System.currentTimeMillis());
 			}
-			
+			catch(IOException e) {
+				e.printStackTrace();
+			}
 			finally {
 				if(canvas != null)
 					surfaceHolder.unlockCanvasAndPost(canvas);
+
 			}
 			
 			synchronized (this) {
 				try {
 					wait();
-					dout.writeLong(System.currentTimeMillis());
+					Log.i(TAG, "Hit target at:" + System.currentTimeMillis());
+					doutTime.writeLong(1);
+					doutTime.writeLong(System.currentTimeMillis());
 				}
 				catch (IOException e) {
 					e.printStackTrace();

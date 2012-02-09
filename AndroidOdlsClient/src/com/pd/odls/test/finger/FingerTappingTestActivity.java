@@ -43,7 +43,8 @@ import com.pd.odls.test.BaseTestActivity;
 import com.pd.odls.util.SupportingUtils;
 
 public class FingerTappingTestActivity extends BaseTestActivity {
-	
+	private static final String TAG = FingerTappingTestActivity.class.getSimpleName();
+
 	public static final int MSG_BUFFER_FULL = 25;
 	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_DATABASE_ERROR = 27;
@@ -62,8 +63,11 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 	//Create the timer task to count down time before test begin
 	private CountDownTimerTask countDownTask;
 	
-	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
-	private DataOutputStream dout;
+	private ByteArrayOutputStream bufferTime = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
+	private DataOutputStream doutTime;
+	private ByteArrayOutputStream bufferCount = new ByteArrayOutputStream();
+	private DataOutputStream doutCount;
+
 	
 	private OdlsDbAdapter databaseManager;
 	
@@ -92,7 +96,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 //				controlBtn.setImageResource(R.drawable.start_80);
 				showDialog(FingerTappingTestActivity.DLG_BUFFER_FULL);
 				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(buffer.toByteArray()));
+				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferTime.toByteArray()));
 				try {
 					while(true) {
 						System.out.print(din.readFloat() + " ");
@@ -138,12 +142,28 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 				if(event.getAction() == MotionEvent.ACTION_DOWN) {
 					if(isRunning && ((FingerTappingTestPanel)testPanel).
 							hitTouchTarget((int)event.getX(), (int)event.getY())) {
+						try {
+							Log.i(TAG, "Hit target at:" + (int)event.getX() + " " + (int)event.getY());
+							doutCount.writeBoolean(true);
+						}
+						catch(IOException e) {
+							e.printStackTrace();
+						}
 						synchronized(testThread) {
 							testThread.notify();
 						}
 					}
+					else if(isRunning) {
+						try {
+							Log.i(TAG, "Miss target at:" + (int)event.getX() + " " + (int)event.getY());
+							doutCount.writeBoolean(false);
+						}
+						catch(IOException e) {
+							e.printStackTrace();
+						}
+					}
 					else {
-						
+						//Do nothing. 
 					}
 					return true;
 				}
@@ -209,7 +229,8 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 		databaseManager = new OdlsDbAdapter(this);
 		
 		//initialize DataOutputStream to store sensed data
-		this.dout = new DataOutputStream(buffer);
+		this.doutTime = new DataOutputStream(bufferTime);
+		this.doutCount = new DataOutputStream(bufferCount);
 	}
 	
 		
@@ -246,7 +267,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 	@Override
 	protected void initializeTest() {
 		//Reset buffer to empty
-		buffer.reset();
+		bufferTime.reset();
 		
 		//Reset isRunning to false
 		isRunning = false;
@@ -256,7 +277,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
 			testThread = new FingerTappingTestThread(testPanel, 
 					testPanel.getHolder(), 
-					dout,
+					doutTime,
 					this, 
 					handler);
 		}
@@ -370,7 +391,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 					.setCancelable(false)
 					.setPositiveButton("Save", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
-							storeToDatabase();
+							storeTest();
 							dialog.dismiss();
 						}
 					})
@@ -399,7 +420,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 					.setCancelable(false)
 					.setPositiveButton("Save", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
-							storeToDatabase();
+							storeTest();
 							dialog.dismiss();
 						}
 					})
@@ -407,7 +428,7 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							buffer.reset();
+							bufferTime.reset();
 						}
 					});
 			dialog = builder.create();
@@ -439,7 +460,9 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 		return super.onCreateDialog(id);
 	}
 	
-	public boolean storeToDatabase() {
+	@Override
+	public boolean storeTest() {
+		//store to database
 		if(!databaseManager.isOnOpen()) {
 			try {
 				databaseManager.open();
@@ -450,15 +473,25 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 				return false;
 			}
 		}
-				
-		byte[] data = buffer.toByteArray();
-
-		int samplePoints = data.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
+		
+		try {
+			doutTime.close();
+			doutCount.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		byte[] data1 = bufferTime.toByteArray();
+		byte[] data2 = bufferCount.toByteArray();
+		
+		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
-		
-		databaseManager.createTest(
-				PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
+		String userId = PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a");
+
+		int testId = (int)databaseManager.createTest(
+				userId,
 				null,
 				testType,
 				beginTime,
@@ -468,12 +501,39 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 				"Test record",
 				sampleRate,
 				null,
-				data,
-				null
+				data1,
+				data2
 		);
-				
+						
+		//write to xml file
+		Test toXML = new Test();
+		toXML.instantiateTest(
+				userId,
+				testId,
+				testType,
+				beginTime,
+				beginTime,
+				endTime,
+				testDuration,
+				"Test record",
+				sampleRate,
+				null,
+				data1,
+				data2);
+
+		try {
+			String xml = toXML.toXML(this);
+			String path = userId + "_" + testId + ".xml";
+			this.saveTempFile(xml, path);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		
 		//clear buffer for next use
-		buffer.reset();
+		bufferTime.reset();
+		bufferCount.reset();
 		return true;
 	}
 
@@ -556,4 +616,6 @@ public class FingerTappingTestActivity extends BaseTestActivity {
 		databaseManager = null;
 		super.onDestroy();
 	}
+	
+
 }

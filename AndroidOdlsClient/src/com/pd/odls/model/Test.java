@@ -1,11 +1,19 @@
 package com.pd.odls.model;
 
+import java.io.StringWriter;
 import java.sql.Date;
 import java.sql.Time;
 
+import org.xmlpull.v1.XmlSerializer;
+
+import android.content.Context;
 import android.database.Cursor;
+import android.util.Base64;
+import android.util.Xml;
+
 import com.pd.odls.R;
 import com.pd.odls.sqlite.OdlsDbAdapter;
+import com.pd.odls.util.SupportingUtils;
 
 
 /**
@@ -42,7 +50,26 @@ public class Test {
 	private String explaination;
 	private Integer sampleRate;
 	private Integer scale;
+	private byte[] data1;
+	private byte[] data2;
 	
+	
+	public byte[] getData1() {
+		return data1;
+	}
+
+	public void setData1(byte[] data1) {
+		this.data1 = data1;
+	}
+
+	public byte[] getData2() {
+		return data2;
+	}
+
+	public void setData2(byte[] data2) {
+		this.data2 = data2;
+	}
+
 	public Test() {
 		super();
 	}
@@ -163,7 +190,52 @@ public class Test {
 	public void setScale(Integer scale) {
 		this.scale = scale;
 	}
-
+	
+	/**
+	 * Instantiate Test instance from directly given value
+	 * @param testerID
+	 * @param testID
+	 * @param type
+	 * @param date
+	 * @param beginTime
+	 * @param endTime
+	 * @param duration
+	 * @param explaination
+	 * @param sampleRate
+	 * @param scale
+	 * @param data1
+	 * @param data2
+	 */
+	public void instantiateTest(String testerID, Integer testID,
+			Integer type, Long date, Long beginTime, Long endTime, Integer duration, String explaination,
+			Integer sampleRate, Integer scale, byte[] data1, byte[] data2) {
+		this.setTesterID(testerID);
+		this.setTestID(testID);
+		this.setType(type);
+		
+		if(date != null) {
+			this.setDate(new Date(date));
+		}
+		else this.setDate(null);
+		
+		if(beginTime != null) {
+			this.setBeginTime(new Time(beginTime));
+		}
+		else this.setBeginTime(null);
+		
+		if(endTime != null) {
+			this.setEndTime(new Time(endTime));
+		}
+		else this.setEndTime(null);
+		
+		this.setDuration(duration);
+		this.setExplaination(explaination);
+		this.setSampleRate(sampleRate);
+		this.setScale(scale);
+		this.setData1(data1);
+		this.setData2(data2);
+		
+	}
 	
 	public void instantiateTest(Cursor c) {
 		int columnIndex = -1;
@@ -244,6 +316,69 @@ public class Test {
 			setScale(c.getInt(columnIndex));
 		else 
 			setScale(null);
+	}
+	
+	//transfer a test case to XML artifact
+	public String toXML(Context context) throws Exception{
+		if(this.testerID == null || this.testerID == null) return null;
+		
+		String ns = "odls";
+		XmlSerializer xmlSerializer = Xml.newSerializer(); 
+		StringWriter writer = new StringWriter();
+		
+	    xmlSerializer.setOutput(writer);
+	    // start DOCUMENT
+	    xmlSerializer.startDocument("UTF-8", true);
+	    // open tag: <patient>
+	    xmlSerializer.startTag(ns, "patient");
+	    xmlSerializer.attribute(ns, "id", this.testerID);
+
+	    // open tag: <test>
+	    xmlSerializer.startTag(ns, "test");
+	    xmlSerializer.attribute(ns, "id", String.valueOf(this.testID));
+	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(ns, "date", this.date == null ? ns : SupportingUtils.dateFormatter.format(date));
+	    xmlSerializer.attribute(ns, "begin", this.beginTime == null ? ns : SupportingUtils.timeFormatter.format(beginTime));
+	    xmlSerializer.attribute(ns, "end", this.endTime == null ? ns : SupportingUtils.timeFormatter.format(this.endTime));
+	    xmlSerializer.attribute(ns, "last", this.duration == null ? ns : String.valueOf(this.duration));
+	    xmlSerializer.attribute(ns, "sample rate", this.sampleRate == null ? ns : String.valueOf(this.sampleRate));
+	    xmlSerializer.attribute(ns, "scale", this.scale == null ? ns : String.valueOf(this.scale));
+
+	
+	    // open tag: <data>
+	    xmlSerializer.startTag(ns, "data");
+	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(ns, "num", "1");
+	    String sData = Base64.encodeToString(data1, Base64.DEFAULT);
+	    xmlSerializer.text(sData);
+	    // close tag: </data>
+	    xmlSerializer.endTag(ns, "data");	
+	    
+	    // open tag: <data>
+	    xmlSerializer.startTag(ns, "data");
+	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(ns, "num", "2");
+	    sData = Base64.encodeToString(data2, Base64.DEFAULT);
+	    xmlSerializer.text(sData);
+	    // close tag: </data>
+	    xmlSerializer.endTag(ns, "data");
+
+	    // open tag: <explanation>
+	    xmlSerializer.startTag(ns, "explanation");
+	    xmlSerializer.text(explaination == null ? "" : explaination);
+	    // close tag: <explanation>
+	    xmlSerializer.endTag(ns, "explanation");
+
+	    // close tag: </test>
+	    xmlSerializer.endTag(ns, "test");
+	    // close tag: </patient>
+	    xmlSerializer.endTag(ns, "patient");
+
+	    // end DOCUMENT
+	    xmlSerializer.endDocument();
+	    xmlSerializer.flush();
+
+		return writer.toString();
 	}
 	
 	public String[] getTestTypes() {

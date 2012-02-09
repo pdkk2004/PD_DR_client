@@ -92,6 +92,7 @@ public class TestHistoryListActivity extends Activity {
 	    
 	    //Get query result cursor
 	    Cursor cursor = databaseManager.fetchTest(sql);
+	    
 	    //Fill the test list content from query result
 		listContent = fillTestArray(cursor);
 		cursor.close();

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -15,7 +16,8 @@ public class SupportingUtils {
 	
 	public static int BYTES_PER_SAMPLING = Float.SIZE / Byte.SIZE;
 	public static float GRAVITY = (float)9.98;
-	
+	public static SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 	//Check whether the network is available
 	public static boolean isNetworkAvailable(Context context) {
 	    ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -90,5 +92,4 @@ public class SupportingUtils {
 		}
 		return output;
 	}
-
 }

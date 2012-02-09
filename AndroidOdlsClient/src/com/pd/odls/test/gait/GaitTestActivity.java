@@ -381,7 +381,7 @@ public class GaitTestActivity extends BaseTestActivity {
 					.setCancelable(false)
 					.setPositiveButton("Save", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
-							storeToDatabase();
+							storeTest();
 							dialog.dismiss();
 						}
 					})
@@ -410,7 +410,7 @@ public class GaitTestActivity extends BaseTestActivity {
 					.setCancelable(false)
 					.setPositiveButton("Save", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
-							storeToDatabase();
+							storeTest();
 							dialog.dismiss();
 							leave();
 						}
@@ -454,7 +454,9 @@ public class GaitTestActivity extends BaseTestActivity {
 		return super.onCreateDialog(id);
 	}
 	
-	public boolean storeToDatabase() {
+	@Override
+	public boolean storeTest() {
+		//store to database
 		if(!databaseManager.isOnOpen()) {
 			try {
 				databaseManager.open();
@@ -465,16 +467,25 @@ public class GaitTestActivity extends BaseTestActivity {
 				return false;
 			}
 		}
-				
+		
+		try {
+			doutAcc.close();
+			doutOri.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		byte[] data1 = bufferAcc.toByteArray();
 		byte[] data2 = bufferOri.toByteArray();
-
-		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING;
+		
+		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
 		int testDuration = (int)(endTime - beginTime);
 		int sampleRate = (int)(1000 * samplePoints / testDuration);
-		
-		databaseManager.createTest(
-				PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a"),
+		String userId = PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a");
+
+		int testId = (int)databaseManager.createTest(
+				userId,
 				null,
 				testType,
 				beginTime,
@@ -487,7 +498,32 @@ public class GaitTestActivity extends BaseTestActivity {
 				data1,
 				data2
 		);
-		
+						
+		//write to xml file
+		Test toXML = new Test();
+		toXML.instantiateTest(
+				userId,
+				testId,
+				testType,
+				beginTime,
+				beginTime,
+				endTime,
+				testDuration,
+				"Test record",
+				sampleRate,
+				null,
+				data1,
+				data2);
+
+		try {
+			String xml = toXML.toXML(this);
+			String path = userId + "_" + testId + ".xml";
+			this.saveTempFile(xml, path);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		
 		//clear buffer for next use
 		bufferAcc.reset();

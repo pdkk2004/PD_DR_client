@@ -1,6 +1,12 @@
 package com.pd.odls.test;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
 import android.app.Activity;
+
+import com.pd.odls.model.Test;
 
 
 public abstract class BaseTestActivity extends Activity {
@@ -63,4 +69,34 @@ public abstract class BaseTestActivity extends Activity {
 	 * To set test thread in this method. Aimed to be implemented
 	 */
 	abstract protected void initializeTest();
+	
+	public boolean sendTest(Test test) {
+		return false;
+	}
+	
+	public boolean saveTempFile(String content, String path) {
+		
+		FileOutputStream fos = null; 
+		OutputStreamWriter osw = null;
+		try {
+			fos = openFileOutput(path, MODE_WORLD_WRITEABLE | MODE_WORLD_READABLE);
+			osw = new OutputStreamWriter(fos);
+			osw.write(content);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		finally {
+			try {
+				osw.close();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+	
+	public abstract boolean storeTest();
 }
