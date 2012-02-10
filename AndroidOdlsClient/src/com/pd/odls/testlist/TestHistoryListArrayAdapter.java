@@ -16,14 +16,14 @@ import android.widget.TextView;
 import com.pd.odls.R;
 import com.pd.odls.model.Test;
 
-public class TestHistoryItemAdapter extends ArrayAdapter<Test>{
+public class TestHistoryListArrayAdapter extends ArrayAdapter<Test>{
 
     private static LayoutInflater inflater = null;
     private Filter filter;
     private ArrayList<Test> items;
     private ArrayList<Test> filtered;
     
-    public TestHistoryItemAdapter(Context context, int resourceId, ArrayList<Test> items) {
+    public TestHistoryListArrayAdapter(Context context, int resourceId, ArrayList<Test> items) {
         super(context, resourceId, items);
         this.filtered = items;
         this.items = new ArrayList<Test>();
@@ -115,7 +115,12 @@ public class TestHistoryItemAdapter extends ArrayAdapter<Test>{
 				add(filtered.get(i));
 			notifyDataSetInvalidated(); 			
 		}
-		
+	}
+
+	@Override
+	public void remove(Test object) {
+		// TODO Auto-generated method stub
+		super.remove(object);
 	}
 	
     

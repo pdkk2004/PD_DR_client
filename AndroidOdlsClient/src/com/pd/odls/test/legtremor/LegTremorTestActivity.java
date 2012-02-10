@@ -382,14 +382,14 @@ public class LegTremorTestActivity extends BaseTestActivity {
 					.setCancelable(false)
 					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Test.TEST_LEG_TREMOR_LEFT);
+							setTestType(Test.TEST_LEFT_TURN);
 							dialog.dismiss();
 							showDialog(DLG_INSTRUCTION_3);
 						}
 					})
 					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Test.TEST_LEG_TREMOR_LEFT);
+							setTestType(Test.TEST_LEFT_TURN);
 							dialog.dismiss();
 							showDialog(DLG_INSTRUCTION_3);
 						}

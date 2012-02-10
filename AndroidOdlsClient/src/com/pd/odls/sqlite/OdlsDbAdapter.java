@@ -137,7 +137,14 @@ public class OdlsDbAdapter {
 	 * @return
 	 */
 	public Cursor fetchTest(String sql) {
-		return database.rawQuery(sql, null);
+		Cursor c = null;
+		try {
+			c = database.rawQuery(sql, null);
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return c;
 	}
 
 	private ContentValues createContentValues(String testerID, Integer testID,

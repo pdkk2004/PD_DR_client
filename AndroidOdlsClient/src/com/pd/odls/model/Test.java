@@ -25,14 +25,14 @@ public class Test {
 	
 	public static int TEST_HAND_TREMOR_LEFT = 1;
 	public static int TEST_HAND_TREMOR_RIGHT = 2;
-	public static int TEST_LEG_TREMOR_LEFT = 3;
-	public static int TEST_LEG_TREMOR_RIGHT = 4;
+	public static int TEST_LEFT_TURN = 3;
+	public static int TEST_RIGHT_TURN = 4;
 	public static int TEST_FINGER_TAPPING_LEFT = 5;
 	public static int TEST_FINGER_TAPPING_RIGHT = 6;
 	public static int TEST_GAIT = 7;
 	
-	public static String TEST_TYPES[] = {"Unknown", "L Hand Tremor", "R Hand Tremor",
-		"L Leg Tremor", "R Leg Tremor", "L Finger Tapping", "R Finger Tapping",
+	public static String TEST_TYPES[] = {"Unknown", "Left Hand Tremor", "Rignt Hand Tremor",
+		"Left Turn", "Right Turn", "Left Finger Tap", "Right Finger Tap",
 		"Gait"};
 	
 	public static int TEST_TYPE_MAP[] = {R.drawable.alert_dialog_icon, R.drawable.hand_tremor,
