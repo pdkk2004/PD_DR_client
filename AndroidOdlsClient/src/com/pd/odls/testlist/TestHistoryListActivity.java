@@ -1,9 +1,22 @@
 package com.pd.odls.testlist;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.apache.http.entity.InputStreamEntity;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,11 +31,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.pd.odls.R;
+import com.pd.odls.http.OdlsHttpClientHelper;
 import com.pd.odls.model.Test;
 import com.pd.odls.model.User;
 import com.pd.odls.sqlite.OdlsDbAdapter;
@@ -33,10 +47,35 @@ public class TestHistoryListActivity extends Activity {
 	private static final int CONTEXT_MENU_SEND = 1;
 	private static final int CONTEXT_MENU_DELETE = 2;
 	
+	//Constant dialog value
+	private static final int DLG_SEND_FAIL = 10;
+	private static final int DLG_SEND_IN_PROGRESS = 17;
+	private static final int DLG_SEND_SUCCESS = 11;
+	private static final int DLG_SEND_ERROR = 15;
+	
 	private OdlsDbAdapter databaseManager;
 	private ListView testsListView;
 	private EditText search;
 	private TestHistoryListCursorAdapter adapter;
+
+	/**
+	 * Handler to deal with result of sending file to server
+	 */
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch(msg.what) {
+			case DLG_SEND_SUCCESS:showDialog(DLG_SEND_SUCCESS);
+				break;
+			case DLG_SEND_FAIL:showDialog(DLG_SEND_FAIL);
+				break;
+			case DLG_SEND_ERROR:showDialog(DLG_SEND_ERROR);
+				break;
+			default:
+				return;
+			}
+		}		
+	};
 
 	@Override
 	protected void onResume() {
@@ -62,9 +101,9 @@ public class TestHistoryListActivity extends Activity {
 			public void onCreateContextMenu(ContextMenu arg0, View arg1,
 					ContextMenuInfo arg2) {
 				  arg0.setHeaderTitle("Available Actions");
-				  arg0.add(Menu.NONE, CONTEXT_MENU_DETAIL, Menu.FIRST, "Show detail");
-				  arg0.add(Menu.NONE, CONTEXT_MENU_SEND, Menu.FIRST + 1, "Send test to server");
-                  arg0.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.FIRST + 2, "Delete this test!");				
+				  arg0.add(Menu.NONE, CONTEXT_MENU_DETAIL, Menu.FIRST, "Detail");
+				  arg0.add(Menu.NONE, CONTEXT_MENU_SEND, Menu.FIRST + 1, "Send");
+                  arg0.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.FIRST + 2, "Delete");				
 			}
 
 		});
@@ -115,30 +154,66 @@ public class TestHistoryListActivity extends Activity {
 	public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) item.getMenuInfo();
         /* Switch on the ID of the item, to get what the user selected. */
-        Test selected = (Test)adapter.getItem(menuInfo.position);
+    	Cursor c = ((CursorAdapter)testsListView.getAdapter()).getCursor();
+        c.moveToPosition(menuInfo.position);
+        Test selectedTest = new Test();
+        selectedTest.instantiateTest(c);
         switch (item.getItemId()) {
         case CONTEXT_MENU_DETAIL:
-        	Log.i(this.getClass().getName(), "Detail:" + selected.getTesterID() + selected.getTestID());
+        	Log.i(this.getClass().getName(), "Detail:" + selectedTest.getTesterID() + selectedTest.getTestID());
         	//TODO: show detail result of selected test
-        	Toast.makeText(this, "Detail:" + selected.getTesterID() + selected.getTestID(), Toast.LENGTH_LONG);
         	return true;
         case CONTEXT_MENU_SEND:
-        	Log.i(this.getClass().getName(),"Send:" + selected.getTesterID() + selected.getTestID());
-        	//TODO: send test xml artifact to server
-        	Toast.makeText(this, "Send:" + selected.getTesterID() + selected.getTestID(), Toast.LENGTH_LONG);
+        	Log.i(this.getClass().getName(),"Send:" + selectedTest.getTesterID() + selectedTest.getTestID());      	
+        	//send test artifact xml file to server
+    		Thread thread = new Thread(new SendFileToServerRunnable(selectedTest));
+    		thread.start();        	
         	return true;
         case CONTEXT_MENU_DELETE:
-        	/* Get the selected item out of the Adapter by its position. */
-        	/* Remove test from the list.*/
-//        	adapter.remove(selected);
+        	/* Remove test from the sqlite database and the list view.*/
+        	databaseManager.deleteTest(selectedTest.getTestID());
+        	c.requery();
         	adapter.notifyDataSetChanged();
-        	return true; /* true means: "we handled the event". */
+        	return true;
         }
         return false;
 	}
+
+	/**
+	 * Function to send test xml instance to server
+	 * @param test
+	 * @return Server response code
+	 */
+	private int sendTestToServer(Test test) {
+		if(test == null) {
+			return DLG_SEND_ERROR;
+		}
+		
+    	String url = PreferenceManager.getDefaultSharedPreferences(this).getString("server.send", "http://10.0.2.2:8080/Odls/send");
+		File file = new File(test.getTesterID() + "_" + test.getTestID() + ".xml");
+		if(file.exists()) {
+			FileInputStream fis = null;
+			try {
+				fis = openFileInput(file.getName());
+				InputStreamEntity fileEntity = new InputStreamEntity(fis, -1);
+				fileEntity.setContentType("binary/octet-stream");
+				fileEntity.setChunked(true); // Send in multiple parts if needed
+				String response = OdlsHttpClientHelper.executeHttpPost(url, fileEntity);				
+				response = response.replaceAll("\\s+", "");
+				if(response.equals("1")) return DLG_SEND_SUCCESS;
+				else return DLG_SEND_FAIL;				
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return DLG_SEND_FAIL;
+	}
 	
 	/**
-	 * Retrieve tests from database
+	 * Retrieve tests from database, bind the query cursor to CursorAdapter
 	 */
 	private void bindAdapter() {		
 		//Get userName from SharedPreference
@@ -185,12 +260,13 @@ public class TestHistoryListActivity extends Activity {
 	    
 	    //Get query result cursor
 	    Cursor cursor = databaseManager.fetchTest(sql);
+		startManagingCursor(cursor);
 		
 	    //Create FilterQueryProvider
-	    TestListFilterQueryProvider provider = new TestListFilterQueryProvider(this, databaseManager);
+	    TestListFilterQueryProvider filterProvider = new TestListFilterQueryProvider(this, databaseManager);
 		
 	    //Create and set Test list adapter
-	    adapter = new TestHistoryListCursorAdapter(this, cursor, provider, R.layout.test_history_list_item);
+	    adapter = new TestHistoryListCursorAdapter(this, cursor, filterProvider, R.layout.test_history_list_item);
 		testsListView.setAdapter(adapter);
 	}
 	
@@ -227,6 +303,86 @@ public class TestHistoryListActivity extends Activity {
 		super.finish();
 	}
 	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog dialog = null;
+		Builder builder = null;
+		switch (id) {
+		case DLG_SEND_FAIL:
+			// Create AlterDialog
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("Error");
+			builder.setMessage("Error to access server. Please check your internet setting!");
+			
+			builder.setCancelable(true);
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//TODO: OK button trigered event
+				}
+			});
+			dialog = builder.create();
+			return dialog;
+		case DLG_SEND_IN_PROGRESS:
+			ProgressDialog progressDialog = new ProgressDialog(this);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					
+				}
+			});
+			return progressDialog;
+		case DLG_SEND_SUCCESS:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("");
+			builder.setMessage("Send file successful!");
+			
+			builder.setCancelable(true);
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//TODO: OK button trigered event
+				}
+			});
+			dialog = builder.create();
+			return dialog;
+		case DLG_SEND_ERROR:
+			// Create AlterDialog
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("Error");
+			builder.setMessage("Application error. Sending file is terminated!");
+			
+			builder.setCancelable(true);
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//TODO: OK button trigered event
+				}
+			});
+			dialog = builder.create();
+			return dialog;
+		}
+		return dialog;
+	}
+
+
+
+	/**
+	 * Implementation of a runnable to delegate the send file to server thread
+	 * @author Pan
+	 *
+	 */
+	private class SendFileToServerRunnable implements Runnable {
+		private Test test;
+		
+		public SendFileToServerRunnable(Test test) {
+			this.test = test;
+		}
+		
+		public void run() {
+			handler.sendEmptyMessage(sendTestToServer(test));
+        	Log.i(this.getClass().getName(),"Complete sending:");
+		}
+		
+	}
 
 	//Prepare List adapter map to be consumed by ListAdapter
 //	private List<HashMap<String, String>> fillListMap(ArrayList<? extends Test> testList) {

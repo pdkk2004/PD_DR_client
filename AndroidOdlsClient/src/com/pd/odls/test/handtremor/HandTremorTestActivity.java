@@ -551,7 +551,7 @@ public class HandTremorTestActivity extends BaseTestActivity {
 		try {
 			String xml = toXML.toXML(this);
 			String path = userId + "_" + testId + ".xml";
-			this.saveTempFile(xml, path);
+			SupportingUtils.saveFileToInternalStorage(this, xml, path);
 		}
 		catch (Exception e) {
 			e.printStackTrace();

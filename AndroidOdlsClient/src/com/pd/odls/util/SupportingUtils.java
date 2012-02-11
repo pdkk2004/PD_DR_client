@@ -1,21 +1,33 @@
 package com.pd.odls.util;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import org.apache.http.entity.InputStreamEntity;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Vibrator;
+import android.util.Log;
+
+import com.pd.odls.http.OdlsHttpClientHelper;
 
 public class SupportingUtils {
 	
+	private static final String TAG = SupportingUtils.class.getName();
 	public static int BYTES_PER_SAMPLING = Float.SIZE / Byte.SIZE;
 	public static float GRAVITY = (float)9.98;
+	
 	public static SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 	//Check whether the network is available
@@ -91,5 +103,94 @@ public class SupportingUtils {
 			}
 		}
 		return output;
+	}
+	
+	
+	/**
+	 * Send file to server through HttpPost request
+	 * @param file
+	 * @return Sever response
+	 */
+	public static String sendFileToServer(File file) {
+		String url = "http://yourserver";
+		String response = null;
+
+		try {
+			InputStreamEntity reqEntity = new InputStreamEntity(
+					new FileInputStream(file), -1);
+			response = OdlsHttpClientHelper.executeHttpPost(url, reqEntity);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			Log.e(TAG, e.getMessage());
+		}
+		return response;
+	}
+	
+	
+	/**
+	 * Save file to internal storage on android device.
+	 * @param context The calling activity on this function
+	 * @param content The String content to write to the file
+	 * @param path The file destination path
+	 * @return
+	 */
+	public static boolean saveFileToInternalStorage(Context context, String content, String path) {
+		
+		FileOutputStream fos = null; 
+		OutputStreamWriter osw = null;
+		try {
+			fos = context.openFileOutput(path, Context.MODE_WORLD_WRITEABLE | Context.MODE_WORLD_READABLE);
+			osw = new OutputStreamWriter(fos);
+			osw.write(content);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		finally {
+			try {
+				osw.close();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Read file to internal storage on android device, and return the content in a String
+	 * @param context The calling activity on this function
+	 * @param content The String content to write to the file
+	 * @param path The file destination path
+	 * @return
+	 */
+	public static String readFileFromInternalStorage(Context context, String path) {
+		StringBuffer content = null;
+		FileInputStream fis = null;
+		BufferedInputStream bif = null;
+		try {
+			int ch;
+			fis = context.openFileInput(path);
+			bif = new BufferedInputStream(fis);
+			content = new StringBuffer();
+			while((ch = bif.read()) != -1) {
+				content.append((char)ch);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				bif.close();
+				fis.close();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return content.toString();
 	}
 }

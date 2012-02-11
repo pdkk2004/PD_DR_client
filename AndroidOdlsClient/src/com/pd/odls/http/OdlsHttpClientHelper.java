@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -33,7 +34,7 @@ public class OdlsHttpClientHelper{
 	 *
 	 * @return an HttpClient object with connection parameters set
 	 */
-	private static HttpClient getHttpClient() {
+	public static HttpClient getHttpClient() {
 		if (httpClient == null) {
 			httpClient = new DefaultHttpClient();
 			final HttpParams params = httpClient.getParams();
@@ -60,6 +61,49 @@ public class OdlsHttpClientHelper{
 			HttpPost request = new HttpPost(url);
 			UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(postParameters);
 			request.setEntity(formEntity);
+			HttpResponse response = client.execute(request);
+			in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+			StringBuffer sb = new StringBuffer("");
+			String line = "";
+			String NL = System.getProperty("line.separator");
+			while ((line = in.readLine()) != null) {
+				sb.append(line + NL);
+			}
+			in.close();
+
+			String result = sb.toString();
+			return result;
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Performs an HTTP Post request to the specified url with the
+	 * specific HttpEntity, and return the string from the HttpResponse.
+	 * @param url The web address to post the request to
+	 * @param httpEntity The entity to send via the request
+	 * @return The result string of the request
+	 * @throws Exception
+	 */
+	public static String executeHttpPost(String url, HttpEntity entity) throws Exception {
+		BufferedReader in = null;
+		try {
+			HttpClient client = getHttpClient();
+			HttpPost request = new HttpPost(url);
+			request.setEntity(entity);
 			HttpResponse response = client.execute(request);
 			in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 

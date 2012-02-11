@@ -3,6 +3,10 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory>
         <EditTextPreference android:key="user_name" android:title="User_name" android:summary="Save user name for application using"></EditTextPreference>
+        <EditTextPreference android:key="server.root"></EditTextPreference>
+        <EditTextPreference android:key="server.login"/>
+        <EditTextPreference android:key="server.send"/>
+        <EditTextPreference android:key="server.receive"/>   
     </PreferenceCategory>
     
 </PreferenceScreen>
