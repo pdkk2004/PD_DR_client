@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.widget.TabHost;
 
 import com.pd.odls.R;
-import com.pd.odls.testlist.TestHistoryListActivity;
-import com.pd.odls.testlist.TestListActivity;
+import com.pd.odls.view.history.TestHistoryListActivity;
+import com.pd.odls.view.history.TestListActivity;
 
 public class MainControlActivity extends TabActivity {
 		

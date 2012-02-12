@@ -20,7 +20,7 @@ import android.net.NetworkInfo;
 import android.os.Vibrator;
 import android.util.Log;
 
-import com.pd.odls.http.OdlsHttpClientHelper;
+import com.pd.odls.utils.http.OdlsHttpClientHelper;
 
 public class SupportingUtils {
 	
