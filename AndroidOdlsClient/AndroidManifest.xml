@@ -2,25 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.pd.odls" android:versionCode="1" android:versionName="1.0">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
-		<activity android:name=".login.LoginActivity" android:label="@string/app_name">
+	    
+	    <activity android:name=".main.MainControlActivity" />    
+		<activity android:name=".view.login.LoginActivity" android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".scale.ABCEvaluationActivity" />
-		<activity android:name=".scale.FallsEvaluationActivityy" />
-		<activity android:name=".main.MainControlActivity" />
-		<activity android:name=".registry.RegistryActivity" />
-		<activity android:name=".testlist.TestListActivity" />
-		<activity android:name=".test.handtremor.HandTremorTestActivity" />
-		<activity android:name=".test.legtremor.LegTremorTestActivity" />
-		<activity android:name=".test.gait.GaitTestActivity" />
-		<activity android:name=".test.finger.FingerTappingTestActivity"
-		    android:screenOrientation="landscape"/>
-		
+		<activity android:name=".view.scale.ABCEvaluationActivity" />
+		<activity android:name=".view.scale.FallsEvaluationActivityy" />
+		<activity android:name=".view.registry.RegistryActivity" />
+		<activity android:name=".view.history.AssessmentHistoryListActivity" />	
+		<activity android:name=".view.assessment.AssessmentListActivity" />
+		<activity android:name=".assessment.handtremor.HandTremorAssessmentActivity" />
+		<activity android:name=".assessment.legtremor.LegTremorAssessmentActivity" />
+		<activity android:name=".assessment.gait.GaitAssessmentActivity" />
+		<activity android:name=".assessment.finger.FingerTappingAssessmentActivity"
+		    android:screenOrientation="landscape"/>	
 		<activity android:name=".main.Preferences" android:label="Preferences"></activity>
-		<activity android:name=".view.history.TestHistoryListActivity" />
 	</application>
 	<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 	<uses-permission android:name="android.permission.INTERNET" />

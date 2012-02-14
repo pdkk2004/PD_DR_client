@@ -16,14 +16,14 @@ import android.widget.TextView;
 import com.pd.odls.R;
 import com.pd.odls.domain.model.Assessment;
 
-public class TestHistoryListCursorAdapter extends CursorAdapter {
+public class AssessmentHistoryListCursorAdapter extends CursorAdapter {
 	
     private Context context;
     private FilterQueryProvider filter;
 	private int layoutId;
 
     
-	public TestHistoryListCursorAdapter(Context context, Cursor c, FilterQueryProvider filter, int layoutId) {
+	public AssessmentHistoryListCursorAdapter(Context context, Cursor c, FilterQueryProvider filter, int layoutId) {
 		super(context, c);
         this.context = context;
         this.layoutId = layoutId;

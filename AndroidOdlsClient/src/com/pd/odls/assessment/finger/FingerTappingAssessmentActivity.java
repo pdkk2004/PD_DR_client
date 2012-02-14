@@ -63,8 +63,10 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 	//Create the timer task to count down time before test begin
 	private CountDownTimerTask countDownTask;
 	
-	private ByteArrayOutputStream bufferTime = new ByteArrayOutputStream();  //create the buffer to store 20 s test data at 5Hz
+	//bufferTime store the time in long format, following the pattern: target appearing time, target hit time, ...repetative
+	private ByteArrayOutputStream bufferTime = new ByteArrayOutputStream();
 	private DataOutputStream doutTime;
+	//bufferCount store the result of user's attempt to touch target, saved in boolen format.
 	private ByteArrayOutputStream bufferCount = new ByteArrayOutputStream();
 	private DataOutputStream doutCount;
 

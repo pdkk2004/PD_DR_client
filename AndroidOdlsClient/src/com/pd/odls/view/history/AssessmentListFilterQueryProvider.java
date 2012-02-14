@@ -9,12 +9,12 @@ import android.widget.FilterQueryProvider;
 import com.pd.odls.domain.model.User;
 import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
-class TestListFilterQueryProvider implements FilterQueryProvider {
+class AssessmentListFilterQueryProvider implements FilterQueryProvider {
 	
 	private Context context;
     private OdlsDbAdapter databaseManager;
     	
-	public TestListFilterQueryProvider(Context context,
+	public AssessmentListFilterQueryProvider(Context context,
 			OdlsDbAdapter databaseManager) {
 		super();
 		this.context = context;

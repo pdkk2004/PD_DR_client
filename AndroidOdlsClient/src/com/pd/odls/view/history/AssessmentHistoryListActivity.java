@@ -43,7 +43,7 @@ import com.pd.odls.domain.model.User;
 import com.pd.odls.utils.http.OdlsHttpClientHelper;
 import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
-public class TestHistoryListActivity extends Activity {
+public class AssessmentHistoryListActivity extends Activity {
 	
 	private static final int CONTEXT_MENU_DETAIL = 0;
 	private static final int CONTEXT_MENU_SEND = 1;
@@ -58,7 +58,7 @@ public class TestHistoryListActivity extends Activity {
 	private OdlsDbAdapter databaseManager;
 	private ListView testsListView;
 	private EditText search;
-	private TestHistoryListCursorAdapter adapter;
+	private AssessmentHistoryListCursorAdapter adapter;
 
 	/**
 	 * Handler to deal with result of sending file to server
@@ -262,10 +262,10 @@ public class TestHistoryListActivity extends Activity {
 		startManagingCursor(cursor);
 		
 	    //Create FilterQueryProvider
-	    TestListFilterQueryProvider filterProvider = new TestListFilterQueryProvider(this, databaseManager);
+	    AssessmentListFilterQueryProvider filterProvider = new AssessmentListFilterQueryProvider(this, databaseManager);
 		
 	    //Create and set Test list adapter
-	    adapter = new TestHistoryListCursorAdapter(this, cursor, filterProvider, R.layout.test_history_list_item);
+	    adapter = new AssessmentHistoryListCursorAdapter(this, cursor, filterProvider, R.layout.test_history_list_item);
 		testsListView.setAdapter(adapter);
 	}
 	

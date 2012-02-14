@@ -322,7 +322,8 @@ public class Assessment {
 	public String toXML(Context context) throws Exception{
 		if(this.testerID == null || this.testerID == null) return null;
 		
-		String ns = "odls";
+		String namespace = "http://www.mapc.com/odls";
+		String prefix = "odls";
 		XmlSerializer xmlSerializer = Xml.newSerializer(); 
 		StringWriter writer = new StringWriter();
 		
@@ -330,49 +331,50 @@ public class Assessment {
 	    // start DOCUMENT
 	    xmlSerializer.startDocument("UTF-8", true);
 	    // open tag: <patient>
-	    xmlSerializer.startTag(ns, "patient");
-	    xmlSerializer.attribute(ns, "id", this.testerID);
+	    xmlSerializer.setPrefix(prefix, namespace);
+	    xmlSerializer.startTag(namespace, "patient");
+	    xmlSerializer.attribute(namespace, "id", this.testerID);
 
 	    // open tag: <test>
-	    xmlSerializer.startTag(ns, "test");
-	    xmlSerializer.attribute(ns, "id", String.valueOf(this.testID));
-	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(ns, "date", this.date == null ? ns : SupportingUtils.dateFormatter.format(date));
-	    xmlSerializer.attribute(ns, "begin", this.beginTime == null ? ns : SupportingUtils.timeFormatter.format(beginTime));
-	    xmlSerializer.attribute(ns, "end", this.endTime == null ? ns : SupportingUtils.timeFormatter.format(this.endTime));
-	    xmlSerializer.attribute(ns, "last", this.duration == null ? ns : String.valueOf(this.duration));
-	    xmlSerializer.attribute(ns, "sample rate", this.sampleRate == null ? ns : String.valueOf(this.sampleRate));
-	    xmlSerializer.attribute(ns, "scale", this.scale == null ? ns : String.valueOf(this.scale));
+	    xmlSerializer.startTag(namespace, "test");
+	    xmlSerializer.attribute(namespace, "id", String.valueOf(this.testID));
+	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(namespace, "date", this.date == null ? namespace : SupportingUtils.dateFormatter.format(date));
+	    xmlSerializer.attribute(namespace, "begin", this.beginTime == null ? namespace : SupportingUtils.timeFormatter.format(beginTime));
+	    xmlSerializer.attribute(namespace, "end", this.endTime == null ? namespace : SupportingUtils.timeFormatter.format(this.endTime));
+	    xmlSerializer.attribute(namespace, "last", this.duration == null ? namespace : String.valueOf(this.duration));
+	    xmlSerializer.attribute(namespace, "sample rate", this.sampleRate == null ? namespace : String.valueOf(this.sampleRate));
+	    xmlSerializer.attribute(namespace, "scale", this.scale == null ? namespace : String.valueOf(this.scale));
 
 	
 	    // open tag: <data>
-	    xmlSerializer.startTag(ns, "data");
-	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(ns, "num", "1");
+	    xmlSerializer.startTag(namespace, "data");
+	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(namespace, "num", "1");
 	    String sData = Base64.encodeToString(data1, Base64.DEFAULT);
 	    xmlSerializer.text(sData);
 	    // close tag: </data>
-	    xmlSerializer.endTag(ns, "data");	
+	    xmlSerializer.endTag(namespace, "data");	
 	    
 	    // open tag: <data>
-	    xmlSerializer.startTag(ns, "data");
-	    xmlSerializer.attribute(ns, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(ns, "num", "2");
+	    xmlSerializer.startTag(namespace, "data");
+	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
+	    xmlSerializer.attribute(namespace, "num", "2");
 	    sData = Base64.encodeToString(data2, Base64.DEFAULT);
 	    xmlSerializer.text(sData);
 	    // close tag: </data>
-	    xmlSerializer.endTag(ns, "data");
+	    xmlSerializer.endTag(namespace, "data");
 
 	    // open tag: <explanation>
-	    xmlSerializer.startTag(ns, "explanation");
+	    xmlSerializer.startTag(namespace, "explanation");
 	    xmlSerializer.text(explaination == null ? "" : explaination);
 	    // close tag: <explanation>
-	    xmlSerializer.endTag(ns, "explanation");
+	    xmlSerializer.endTag(namespace, "explanation");
 
 	    // close tag: </test>
-	    xmlSerializer.endTag(ns, "test");
+	    xmlSerializer.endTag(namespace, "test");
 	    // close tag: </patient>
-	    xmlSerializer.endTag(ns, "patient");
+	    xmlSerializer.endTag(namespace, "patient");
 
 	    // end DOCUMENT
 	    xmlSerializer.endDocument();

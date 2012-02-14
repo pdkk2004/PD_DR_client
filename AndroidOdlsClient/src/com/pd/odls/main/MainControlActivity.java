@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.widget.TabHost;
 
 import com.pd.odls.R;
-import com.pd.odls.view.history.TestHistoryListActivity;
-import com.pd.odls.view.history.TestListActivity;
+import com.pd.odls.view.assessment.AssessmentListActivity;
+import com.pd.odls.view.history.AssessmentHistoryListActivity;
 
 public class MainControlActivity extends TabActivity {
 		
@@ -24,7 +24,7 @@ public class MainControlActivity extends TabActivity {
 		Intent intent;
 		
 		//bind TestListActivity to tab_1
-		intent = new Intent().setClass(this, TestListActivity.class);
+		intent = new Intent().setClass(this, AssessmentListActivity.class);
 	    spec = tabHost.newTabSpec("Test")
 	    		.setIndicator("Tests", res.getDrawable(R.drawable.tab_icon_selector))
 	    		.setContent(intent);    
@@ -39,7 +39,7 @@ public class MainControlActivity extends TabActivity {
 	    tabHost.addTab(spec);
 	    
 	    //bind test history view to tab_3
-	    intent = new Intent().setClass(this, TestHistoryListActivity.class);
+	    intent = new Intent().setClass(this, AssessmentHistoryListActivity.class);
 	    spec = tabHost.newTabSpec("History Test")
 	    		.setIndicator("History", res.getDrawable(R.drawable.tab_icon_selector))
 	    		.setContent(intent);

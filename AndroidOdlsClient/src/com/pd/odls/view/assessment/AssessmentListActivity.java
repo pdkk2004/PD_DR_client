@@ -1,4 +1,4 @@
-package com.pd.odls.view.history;
+package com.pd.odls.view.assessment;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -19,7 +19,7 @@ import com.pd.odls.assessment.gait.GaitAssessmentActivity;
 import com.pd.odls.assessment.handtremor.HandTremorAssessmentActivity;
 import com.pd.odls.assessment.legtremor.LegTremorAssessmentActivity;
 
-public class TestListActivity extends ListActivity {
+public class AssessmentListActivity extends ListActivity {
 
 	private static final int REQUEST_TEST = 10;
 	

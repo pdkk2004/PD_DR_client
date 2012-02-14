@@ -16,14 +16,14 @@ import android.widget.TextView;
 import com.pd.odls.R;
 import com.pd.odls.domain.model.Assessment;
 
-public class TestHistoryListArrayAdapter extends ArrayAdapter<Assessment>{
+public class AssessmentHistoryListArrayAdapter extends ArrayAdapter<Assessment>{
 
     private static LayoutInflater inflater = null;
     private Filter filter;
     private ArrayList<Assessment> items;
     private ArrayList<Assessment> filtered;
     
-    public TestHistoryListArrayAdapter(Context context, int resourceId, ArrayList<Assessment> items) {
+    public AssessmentHistoryListArrayAdapter(Context context, int resourceId, ArrayList<Assessment> items) {
         super(context, resourceId, items);
         this.filtered = items;
         this.items = new ArrayList<Assessment>();
