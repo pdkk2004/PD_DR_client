@@ -1,10 +1,7 @@
 package com.pd.odls.assessment.gait;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.Timer;
@@ -53,7 +50,7 @@ import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
 public class GaitAssessmentActivity extends BaseAssessmentActivity {
 	
-	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_BUFFER_FULL = 20;
 	private static final int DLG_DATABASE_ERROR = 27;
@@ -99,24 +96,11 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 			case MSG_TEST_TIME_CHANGE:
 				elapsedTimeView.setText(String.valueOf(elapsedTime));
 				break;
-			case MSG_BUFFER_FULL:
+			case MSG_TIME_END:
 				stopTest();
 				timer.cancel();
 				controlBtn.setText("Start");
-				showDialog(GaitAssessmentActivity.DLG_BUFFER_FULL);
-				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferAcc.toByteArray()));
-				try {
-					while(true) {
-						System.out.print(din.readFloat() + " ");
-					}
-				}
-				catch(EOFException eof) {
-					Log.i(this.toString(), "Reach end of buffer");
-				}
-				catch(IOException e) {
-					Log.e(GaitAssessmentActivity.class.getCanonicalName(), e.getMessage());
-				}
+				showDialog(GaitAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
@@ -299,6 +283,9 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
+				if(elapsedTime > 30) {
+					handler.sendEmptyMessage(MSG_TIME_END);
+				}
 				synchronized(this) {
 					if(pause) {
 						try {
@@ -419,8 +406,6 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							bufferAcc.reset();
-							bufferOri.reset();
 							leave();
 						}
 					});

@@ -3,8 +3,10 @@
 	package="com.pd.odls" android:versionCode="1" android:versionName="1.0">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 	    
-	    <activity android:name=".main.MainControlActivity" />    
-		<activity android:name=".view.login.LoginActivity" android:label="@string/app_name">
+	    <activity android:name=".main.MainControlActivity" 
+	        android:screenOrientation="portrait"/>
+		<activity android:name=".view.login.LoginActivity" android:label="@string/app_name"
+			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -12,12 +14,16 @@
 		</activity>
 		<activity android:name=".view.scale.ABCEvaluationActivity" />
 		<activity android:name=".view.scale.FallsEvaluationActivityy" />
-		<activity android:name=".view.registry.RegistryActivity" />
+		<activity android:name=".view.registry.RegistryActivity"
+		  	android:screenOrientation="portrait" />
 		<activity android:name=".view.history.AssessmentHistoryListActivity" />	
 		<activity android:name=".view.assessment.AssessmentListActivity" />
-		<activity android:name=".assessment.handtremor.HandTremorAssessmentActivity" />
-		<activity android:name=".assessment.legtremor.LegTremorAssessmentActivity" />
-		<activity android:name=".assessment.gait.GaitAssessmentActivity" />
+		<activity android:name=".assessment.handtremor.HandTremorAssessmentActivity"
+			android:screenOrientation="portrait" />
+		<activity android:name=".assessment.turn.TurnAssessmentActivity"
+		  	android:screenOrientation="portrait" />
+		<activity android:name=".assessment.gait.GaitAssessmentActivity"
+		    android:screenOrientation="portrait" />
 		<activity android:name=".assessment.finger.FingerTappingAssessmentActivity"
 		    android:screenOrientation="landscape"/>	
 		<activity android:name=".main.Preferences" android:label="Preferences"></activity>

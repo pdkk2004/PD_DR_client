@@ -3,7 +3,6 @@ package com.pd.odls.main;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -64,6 +63,5 @@ public class MainControlActivity extends TabActivity {
 		edit.putString("server.login", server_root + "/Odls/login");
 		edit.putString("server.send", server_root + "/Odls/send");
 		edit.commit();
-		String s = preferences.getString("server.root", "");
 	}
 }

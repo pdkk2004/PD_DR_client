@@ -17,7 +17,7 @@ import com.pd.odls.R;
 import com.pd.odls.assessment.finger.FingerTappingAssessmentActivity;
 import com.pd.odls.assessment.gait.GaitAssessmentActivity;
 import com.pd.odls.assessment.handtremor.HandTremorAssessmentActivity;
-import com.pd.odls.assessment.legtremor.LegTremorAssessmentActivity;
+import com.pd.odls.assessment.turn.TurnAssessmentActivity;
 
 public class AssessmentListActivity extends ListActivity {
 
@@ -57,7 +57,7 @@ public class AssessmentListActivity extends ListActivity {
 			i = new Intent(this, FingerTappingAssessmentActivity.class);
 			break;
 		case 3:
-			i = new Intent(this, LegTremorAssessmentActivity.class);
+			i = new Intent(this, TurnAssessmentActivity.class);
 			break;
 		default:
 			return;

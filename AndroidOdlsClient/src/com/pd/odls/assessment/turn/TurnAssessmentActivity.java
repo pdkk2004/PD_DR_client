@@ -1,10 +1,7 @@
-package com.pd.odls.assessment.legtremor;
+package com.pd.odls.assessment.turn;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.Timer;
@@ -49,9 +46,9 @@ import com.pd.odls.domain.model.User;
 import com.pd.odls.util.SupportingUtils;
 import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
-public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
+public class TurnAssessmentActivity extends BaseAssessmentActivity {
 	
-	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_BUFFER_FULL = 20;
 	private static final int DLG_DATABASE_ERROR = 27;
@@ -98,28 +95,15 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 			case MSG_TEST_TIME_CHANGE:
 				elapsedTimeView.setText(String.valueOf(elapsedTime));
 				break;
-			case MSG_BUFFER_FULL:
+			case MSG_TIME_END:
 				stopTest();
 				timer.cancel();
 				controlBtn.setText("Start");
-				showDialog(LegTremorAssessmentActivity.DLG_BUFFER_FULL);
-				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferAcc.toByteArray()));
-				try {
-					while(true) {
-						System.out.print(din.readFloat() + " ");
-					}
-				}
-				catch(EOFException eof) {
-					Log.i(this.toString(), "Reach end of buffer");
-				}
-				catch(IOException e) {
-					Log.e(LegTremorAssessmentActivity.class.getCanonicalName(), e.getMessage());
-				}
+				showDialog(TurnAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
-					LegTremorAssessmentActivity.this.countDownDlg.setMessage(
+					TurnAssessmentActivity.this.countDownDlg.setMessage(
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
 				}
 				else {
@@ -141,7 +125,7 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 				getResources(), R.drawable.red_point));
 		
 		//create the test panel 
-		testPanel = new LegTremorAssessmentPanel(this, mo);
+		testPanel = new TurnAssessmentPanel(this, mo);
 		testPanel.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View view, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -176,7 +160,7 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 				if(isRunning == false) {
 					initializeTest();
 					Timer t = new Timer();
-					countDownDlg = ProgressDialog.show(LegTremorAssessmentActivity.this, "Ready... Test will begin in", 
+					countDownDlg = ProgressDialog.show(TurnAssessmentActivity.this, "Ready... Test will begin in", 
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
 					t.schedule(countDownTask, 1000, 1000);
 					controlBtn.setText("Stop");		
@@ -242,7 +226,7 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 		
 		//initialize test thread
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
-			testThread = new LegTremorAssessmentThread(testPanel, 
+			testThread = new TurnAssessmentThread(testPanel, 
 					testPanel.getHolder(), 
 					doutAcc,
 					doutOri,
@@ -295,6 +279,9 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
+				if(elapsedTime > 15) {
+					handler.sendEmptyMessage(MSG_TIME_END);
+				}
 				synchronized(this) {
 					if(pause) {
 						try {
@@ -451,8 +438,6 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							bufferAcc.reset();
-							bufferOri.reset();
 							leave();
 						}
 					});
@@ -470,7 +455,7 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 					stopTest();
 					timer.cancel();
 					controlBtn.setText("Start");
-					LegTremorAssessmentActivity.this.leave();
+					TurnAssessmentActivity.this.leave();
 				}
 			})
 			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -623,6 +608,8 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
+		this.bufferAcc.reset();
+		this.bufferOri.reset();
 		super.finish();
 	}
 	

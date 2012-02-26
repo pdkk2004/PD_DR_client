@@ -1,13 +1,9 @@
 package com.pd.odls.assessment.finger;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,7 +19,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -47,7 +42,7 @@ import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 	private static final String TAG = FingerTappingAssessmentActivity.class.getSimpleName();
 
-	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
@@ -94,24 +89,11 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 			case MSG_TEST_TIME_CHANGE:
 				testProgressBar.setProgress((int)Math.round(elapsedTime / 30.0 * 100.0));
 				break;
-			case MSG_BUFFER_FULL:
+			case MSG_TIME_END:
 				stopTest();
 				timer.cancel();
-//				controlBtn.setImageResource(R.drawable.start_80);
-				showDialog(FingerTappingAssessmentActivity.DLG_BUFFER_FULL);
-				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferTime.toByteArray()));
-				try {
-					while(true) {
-						System.out.print(din.readFloat() + " ");
-					}
-				}
-				catch(EOFException eof) {
-					Log.i(this.toString(), "Reach end of buffer");
-				}
-				catch(IOException e) {
-					Log.e(FingerTappingAssessmentActivity.class.getCanonicalName(), e.getMessage());
-				}
+				controlBtn.setText("Start");
+				showDialog(FingerTappingAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
@@ -298,6 +280,9 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
+				if(elapsedTime > 15) {
+					handler.sendEmptyMessage(MSG_TIME_END);
+				}
 				synchronized(this) {
 					if(pause) {
 						try {
@@ -426,13 +411,14 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							storeTest();
 							dialog.dismiss();
+							leave();
 						}
 					})
 					.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							bufferTime.reset();
+							leave();
 						}
 					});
 			dialog = builder.create();
@@ -645,6 +631,8 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
+		this.bufferCount.reset();
+		this.bufferTime.reset();
 		super.finish();
 	}
 	

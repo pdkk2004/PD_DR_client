@@ -1,4 +1,4 @@
-package com.pd.odls.assessment.legtremor;
+package com.pd.odls.assessment.turn;
 
 import java.io.DataOutputStream;
 
@@ -9,9 +9,9 @@ import android.view.SurfaceHolder;
 import com.pd.odls.assessment.BaseAssessmentPanel;
 import com.pd.odls.assessment.MotionSensingThread;
 
-public class LegTremorAssessmentThread extends MotionSensingThread {
+public class TurnAssessmentThread extends MotionSensingThread {
 
-	public LegTremorAssessmentThread(BaseAssessmentPanel testPanel,
+	public TurnAssessmentThread(BaseAssessmentPanel testPanel,
 			SurfaceHolder surfaceHolder, DataOutputStream doutAcc,
 			DataOutputStream doutOri,
 			Context context, Handler handler) {

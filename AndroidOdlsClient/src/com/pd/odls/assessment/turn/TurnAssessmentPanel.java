@@ -1,4 +1,4 @@
-package com.pd.odls.assessment.legtremor;
+package com.pd.odls.assessment.turn;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,13 +9,13 @@ import android.util.Log;
 import com.pd.odls.assessment.BaseAssessmentPanel;
 import com.pd.odls.assessment.MovingObject;
 
-public class LegTremorAssessmentPanel extends BaseAssessmentPanel {
+public class TurnAssessmentPanel extends BaseAssessmentPanel {
 
-	private static final String TAG = LegTremorAssessmentPanel.class.getSimpleName();
+	private static final String TAG = TurnAssessmentPanel.class.getSimpleName();
 
 	private MovingObject target;
 	
-	public LegTremorAssessmentPanel(Context context, MovingObject o) {
+	public TurnAssessmentPanel(Context context, MovingObject o) {
 		super(context);
 		this.target = o;
 	}

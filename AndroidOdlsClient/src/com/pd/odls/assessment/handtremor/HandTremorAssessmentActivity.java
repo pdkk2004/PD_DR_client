@@ -1,10 +1,7 @@
 package com.pd.odls.assessment.handtremor;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.Timer;
@@ -51,7 +48,7 @@ import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
 public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 	
-	public static final int MSG_BUFFER_FULL = 25;
+	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
@@ -98,24 +95,11 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 			case MSG_TEST_TIME_CHANGE:
 				elapsedTimeView.setText(String.valueOf(elapsedTime));
 				break;
-			case MSG_BUFFER_FULL:
+			case MSG_TIME_END:
 				stopTest();
 				timer.cancel();
 				controlBtn.setText("Start");
-				showDialog(HandTremorAssessmentActivity.DLG_BUFFER_FULL);
-				
-				DataInputStream din = new DataInputStream(new ByteArrayInputStream(bufferAcc.toByteArray()));
-				try {
-					while(true) {
-						System.out.print(din.readFloat() + " ");
-					}
-				}
-				catch(EOFException eof) {
-					Log.i(this.toString(), "Reach end of buffer");
-				}
-				catch(IOException e) {
-					Log.e(HandTremorAssessmentActivity.class.getCanonicalName(), e.getMessage());
-				}
+				showDialog(HandTremorAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
@@ -298,6 +282,9 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
+				if(elapsedTime > 15) {
+					handler.sendEmptyMessage(MSG_TIME_END);
+				}
 				synchronized(this) {
 					if(pause) {
 						try {
@@ -310,6 +297,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 				}
 			}			
 		};
+		
 		timer = new Timer();
 		elapsedTime = 0;	
 	}	
@@ -447,6 +435,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							storeTest();
 							dialog.dismiss();
+							leave();
 						}
 					})
 					.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
@@ -455,6 +444,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 							dialog.dismiss();
 							bufferAcc.reset();
 							bufferOri.reset();
+							leave();
 						}
 					});
 			dialog = builder.create();
@@ -625,6 +615,8 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
+		this.bufferAcc.reset();
+		this.bufferOri.reset();
 		super.finish();
 	}
 	
