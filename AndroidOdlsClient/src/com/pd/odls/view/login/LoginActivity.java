@@ -172,7 +172,8 @@ public class LoginActivity extends Activity implements Runnable {
 
 		String response = null;
 		try {
-			response = OdlsHttpClientHelper.executeHttpPost("http://10.0.2.2:8080/Odls/login", postParameters);
+			String url = preferences.getString("server.login", "http://10.0.2.2:8080/Odls/login");
+			response = OdlsHttpClientHelper.executeHttpPost(url, postParameters);
 			String res=response.toString();
 			res = res.replaceAll("\\s+", "");
 			if(res.equals("1")) return 1;

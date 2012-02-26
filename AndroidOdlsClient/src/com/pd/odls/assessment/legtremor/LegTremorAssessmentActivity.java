@@ -378,7 +378,7 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 			dialog = builder.create();
 			return dialog;
 		case DLG_INSTRUCTION_2:
-			builder.setMessage("Please select which side of leg you are going to test, Left or Right?")
+			builder.setMessage("Please select which direction you want to turn, left or right? ")
 					.setCancelable(false)
 					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -521,7 +521,6 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 				null,
 				testType,
 				beginTime,
-				beginTime,
 				endTime,
 				testDuration,
 				"Test record",
@@ -537,7 +536,6 @@ public class LegTremorAssessmentActivity extends BaseAssessmentActivity {
 				userId,
 				testId,
 				testType,
-				beginTime,
 				beginTime,
 				endTime,
 				testDuration,

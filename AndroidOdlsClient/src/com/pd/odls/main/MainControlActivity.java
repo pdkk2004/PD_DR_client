@@ -2,8 +2,11 @@ package com.pd.odls.main;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.TabHost;
 
 import com.pd.odls.R;
@@ -46,6 +49,21 @@ public class MainControlActivity extends TabActivity {
 	    tabHost.addTab(spec);
 	    
 	    tabHost.setCurrentTab(0);
-	
+	    
+        //load App preferences
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //set the server url
+		SharedPreferences.Editor edit = preferences.edit();
+		
+		//default server_root on local machine
+//		String serve_root = "http://10.0.2.2:8080";
+		String server_root = "http://192.168.1.101:8080";
+		edit.putString("server.root", server_root);
+		edit.putString("server.login", server_root + "/Odls/login");
+		edit.putString("server.send", server_root + "/Odls/send");
+		edit.commit();
+		String s = preferences.getString("server.root", "");
 	}
 }

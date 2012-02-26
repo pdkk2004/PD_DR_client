@@ -52,7 +52,7 @@ public class AssessmentHistoryListCursorAdapter extends CursorAdapter {
 		test.instantiateTest(c);
 		//bind test date text
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		String date = sdf.format(test.getDate());
+		String date = sdf.format(test.getBeginTime());
 		sdf = new SimpleDateFormat("HH:mm");
 		String time = sdf.format(test.getBeginTime());
 		testDate.setText(date + " @" + time);
@@ -85,7 +85,7 @@ public class AssessmentHistoryListCursorAdapter extends CursorAdapter {
         test.instantiateTest(c);
         //bind test date text
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		String date = sdf.format(test.getDate());
+		String date = sdf.format(test.getBeginTime());
 		sdf = new SimpleDateFormat("HH:mm");
 		String time = sdf.format(test.getBeginTime());
         testDate.setText(date + " @" + time);

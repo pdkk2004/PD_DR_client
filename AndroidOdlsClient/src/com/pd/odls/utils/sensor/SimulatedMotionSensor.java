@@ -40,30 +40,37 @@ public class SimulatedMotionSensor {
         public void onSensorChanged(SensorEvent event) {
         	System.out.println("Orientation sensor on");
 
-        	if (event.type == Sensor.TYPE_ACCELEROMETER) {
+        	if (event.type== Sensor.TYPE_ACCELEROMETER) {
+            	
+        		//obtain translation acceleration
         		mGravity = event.values;
         		if(accelerationDelegate != null) {
         			accelerationDelegate.onSensedValueChanged(mGravity[0],
         					mGravity[1],
         					mGravity[2]);
         		}
-        	}
-        	if (event.type == Sensor.TYPE_MAGNETIC_FIELD)
+        		
+        		//obtain orientation acceleration
+            	if (mGravity != null && mGeomagnetic != null) {
+            		float R[] = new float[9];
+            		float I[] = new float[9];
+            		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            		if (success) {
+            			float orientation[] = new float[3]; 
+            			SensorManager.getOrientation(R, orientation); 
+            			x = orientation[0]; // orientation azimut
+            			y = orientation[1]; // orientation pitch
+            			z = orientation[2]; // orientation roll
+                    	if(orientationDelegate != null)
+                    		orientationDelegate.onSensedValueChanged(x, y, z);
+            		}
+            	}
+        	}        	
+        	else if (event.type == Sensor.TYPE_MAGNETIC_FIELD) {
         		mGeomagnetic = event.values;
-        	
-        	if (mGravity != null && mGeomagnetic != null) {
-        		float R[] = new float[9];
-        		float I[] = new float[9];
-        		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
-        		if (success) {
-        			float orientation[] = new float[3]; 
-        			SensorManager.getOrientation(R, orientation); 
-        			x = orientation[0]; // orientation azimut
-        			y = orientation[1]; // orientation pitch
-        			z = orientation[2]; // orientation roll
-                	if(orientationDelegate != null)
-                		orientationDelegate.onSensedValueChanged(x, y, z);
-        		}
+        	}
+        	else {
+        		
         	}
         }
     };

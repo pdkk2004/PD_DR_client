@@ -1,8 +1,8 @@
 package com.pd.odls.domain.model;
 
 import java.io.StringWriter;
-import java.sql.Date;
 import java.sql.Time;
+import java.util.Date;
 
 import org.xmlpull.v1.XmlSerializer;
 
@@ -43,9 +43,8 @@ public class Assessment {
 	private String testerID;
 	private Integer testID;
 	private Integer type;
-	private Date date;
-	private Time beginTime;
-	private Time endTime;
+	private Date beginTime;
+	private Date endTime;
 	private Integer duration;
 	private String explaination;
 	private Integer sampleRate;
@@ -79,26 +78,13 @@ public class Assessment {
 	}
 
 
-
-	public Date getDate() {
-		return date;
-	}
-
-
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-
-
-	public void setBeginTime(Time beginTime) {
+	public void setBeginTime(Date beginTime) {
 		this.beginTime = beginTime;
 	}
 
 
 
-	public void setEndTime(Time endTime) {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
@@ -110,13 +96,13 @@ public class Assessment {
 
 
 
-	public Time getBeginTime() {
+	public Date getBeginTime() {
 		return beginTime;
 	}
 
 
 
-	public Time getEndTime() {
+	public Date getEndTime() {
 		return endTime;
 	}
 
@@ -196,7 +182,6 @@ public class Assessment {
 	 * @param testerID
 	 * @param testID
 	 * @param type
-	 * @param date
 	 * @param beginTime
 	 * @param endTime
 	 * @param duration
@@ -207,24 +192,19 @@ public class Assessment {
 	 * @param data2
 	 */
 	public void instantiateTest(String testerID, Integer testID,
-			Integer type, Long date, Long beginTime, Long endTime, Integer duration, String explaination,
+			Integer type, Long beginTime, Long endTime, Integer duration, String explaination,
 			Integer sampleRate, Integer scale, byte[] data1, byte[] data2) {
 		this.setTesterID(testerID);
 		this.setTestID(testID);
 		this.setType(type);
 		
-		if(date != null) {
-			this.setDate(new Date(date));
-		}
-		else this.setDate(null);
-		
 		if(beginTime != null) {
-			this.setBeginTime(new Time(beginTime));
+			this.setBeginTime(new Date(beginTime));
 		}
 		else this.setBeginTime(null);
 		
 		if(endTime != null) {
-			this.setEndTime(new Time(endTime));
+			this.setEndTime(new Date(endTime));
 		}
 		else this.setEndTime(null);
 		
@@ -261,19 +241,11 @@ public class Assessment {
 		else 
 			setType(null);
 		
-		//fill test date
-		columnIndex = c.getColumnIndex(OdlsDbAdapter.FIELD_DATE);
-		if(!c.isNull(columnIndex)) {
-			Date d = new Date(c.getLong(columnIndex));
-			setDate(d);
-		}
-		else
-			setDate(null);
 		
 		//fill test beginTime
 		columnIndex = c.getColumnIndex(OdlsDbAdapter.FIELD_BEGIN_TIME);
 		if(!c.isNull(columnIndex)) {
-			Time t = new Time(c.getLong(columnIndex));
+			Date t = new Date(c.getLong(columnIndex));
 			setBeginTime(t);
 		}
 		else 
@@ -282,7 +254,7 @@ public class Assessment {
 		//fill test endTime
 		columnIndex = c.getColumnIndex(OdlsDbAdapter.FIELD_END_TIME);
 		if(!c.isNull(columnIndex)) {
-			Time t = new Time(c.getLong(columnIndex));
+			Date t = new Time(c.getLong(columnIndex));
 			setEndTime(t);
 		}
 		else 
@@ -330,40 +302,36 @@ public class Assessment {
 	    xmlSerializer.setOutput(writer);
 	    // start DOCUMENT
 	    xmlSerializer.startDocument("UTF-8", true);
-	    // open tag: <patient>
+	    // open tag: <tests_container>
 	    xmlSerializer.setPrefix(prefix, namespace);
-	    xmlSerializer.startTag(namespace, "patient");
-	    xmlSerializer.attribute(namespace, "id", this.testerID);
+	    xmlSerializer.startTag(namespace, "tests_container");
+	    xmlSerializer.attribute(namespace, "tester_id", this.testerID);
 
 	    // open tag: <test>
 	    xmlSerializer.startTag(namespace, "test");
-	    xmlSerializer.attribute(namespace, "id", String.valueOf(this.testID));
-	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(namespace, "date", this.date == null ? namespace : SupportingUtils.dateFormatter.format(date));
+	    xmlSerializer.attribute(namespace, "tester_id", this.testerID);
+	    xmlSerializer.attribute(namespace, "test_id", String.valueOf(this.testID));
+	    xmlSerializer.attribute(namespace, "type", String.valueOf(type));
 	    xmlSerializer.attribute(namespace, "begin", this.beginTime == null ? namespace : SupportingUtils.timeFormatter.format(beginTime));
 	    xmlSerializer.attribute(namespace, "end", this.endTime == null ? namespace : SupportingUtils.timeFormatter.format(this.endTime));
-	    xmlSerializer.attribute(namespace, "last", this.duration == null ? namespace : String.valueOf(this.duration));
-	    xmlSerializer.attribute(namespace, "sample rate", this.sampleRate == null ? namespace : String.valueOf(this.sampleRate));
-	    xmlSerializer.attribute(namespace, "scale", this.scale == null ? namespace : String.valueOf(this.scale));
+	    xmlSerializer.attribute(namespace, "duration", this.duration == null ? namespace : String.valueOf(this.duration));
+	    xmlSerializer.attribute(namespace, "sample_rate", this.sampleRate == null ? namespace : String.valueOf(this.sampleRate));
+	    xmlSerializer.attribute(namespace, "scale", this.scale == null ? "-1" : String.valueOf(this.scale));
 
 	
-	    // open tag: <data>
-	    xmlSerializer.startTag(namespace, "data");
-	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(namespace, "num", "1");
+	    // open tag: <data1>
+	    xmlSerializer.startTag(namespace, "data1");
 	    String sData = Base64.encodeToString(data1, Base64.DEFAULT);
 	    xmlSerializer.text(sData);
-	    // close tag: </data>
-	    xmlSerializer.endTag(namespace, "data");	
+	    // close tag: </data1>
+	    xmlSerializer.endTag(namespace, "data1");	
 	    
 	    // open tag: <data>
-	    xmlSerializer.startTag(namespace, "data");
-	    xmlSerializer.attribute(namespace, "type", TEST_TYPES[type]);
-	    xmlSerializer.attribute(namespace, "num", "2");
+	    xmlSerializer.startTag(namespace, "data2");
 	    sData = Base64.encodeToString(data2, Base64.DEFAULT);
 	    xmlSerializer.text(sData);
 	    // close tag: </data>
-	    xmlSerializer.endTag(namespace, "data");
+	    xmlSerializer.endTag(namespace, "data2");
 
 	    // open tag: <explanation>
 	    xmlSerializer.startTag(namespace, "explanation");
@@ -374,7 +342,7 @@ public class Assessment {
 	    // close tag: </test>
 	    xmlSerializer.endTag(namespace, "test");
 	    // close tag: </patient>
-	    xmlSerializer.endTag(namespace, "patient");
+	    xmlSerializer.endTag(namespace, "tests_container");
 
 	    // end DOCUMENT
 	    xmlSerializer.endDocument();

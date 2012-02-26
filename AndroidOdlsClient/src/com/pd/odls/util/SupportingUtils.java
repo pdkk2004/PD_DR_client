@@ -29,7 +29,7 @@ public class SupportingUtils {
 	public static float GRAVITY = (float)9.98;
 	
 	public static SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	//Check whether the network is available
 	public static boolean isNetworkAvailable(Context context) {
 	    ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);

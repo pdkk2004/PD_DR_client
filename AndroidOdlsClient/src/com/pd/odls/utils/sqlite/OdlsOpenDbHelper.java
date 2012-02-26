@@ -17,7 +17,6 @@ public class OdlsOpenDbHelper extends SQLiteOpenHelper  {
 			" (tester_id text not null, "
 			+ "_id INTEGER PRIMARY KEY ASC,"
 			+ "type integer,"
-			+ "date integer,"
 			+ "begin_time integer,"
 			+ "end_time integer,"
 			+ "duration integer,"

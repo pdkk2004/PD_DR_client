@@ -72,7 +72,6 @@ public class FingerTappingAssessmentThread extends BaseAssessmentThread {
 			finally {
 				if(canvas != null)
 					surfaceHolder.unlockCanvasAndPost(canvas);
-
 			}
 			
 			synchronized (this) {

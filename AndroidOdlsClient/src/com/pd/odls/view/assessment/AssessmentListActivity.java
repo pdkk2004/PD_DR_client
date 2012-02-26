@@ -28,8 +28,8 @@ public class AssessmentListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		//set test name array
-		String[] testNames = {"Test hand tremor", "Test gait",
-				"Test finger tapping", "Test leg tremor"};
+		String[] testNames = {"Test hand tremor", "Test walking",
+				"Test finger tapping", "Test turnning"};
 		
 		int[] testImage = {R.drawable.hand_tremor, R.drawable.gait_difficulty,
 				R.drawable.finger_tapping, R.drawable.leg_tremor};

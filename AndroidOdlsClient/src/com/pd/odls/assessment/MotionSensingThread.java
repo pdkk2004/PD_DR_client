@@ -92,7 +92,7 @@ public class MotionSensingThread extends BaseAssessmentThread {
 				offSetZ = Math.round(z);
 				doutAcc.writeFloat(x);
 				doutAcc.writeFloat(y);
-				doutAcc.writeFloat(z - (float)9.98);
+				doutAcc.writeFloat(z);
 				doutAcc.flush();
 				System.out.println("Acceleration:" + x + " " + y + " " + z);
 			}

@@ -17,9 +17,13 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 
 	private MovingObject target;
 	private Point topLeft;
+	private Point topRight;
+	private Point bottomLeft;	
 	private Point bottomRight;
 	private int flag;
 	private Region topLeftRegion;
+	private Region topRightRegion;
+	private Region bottomLeftRegion;	
 	private Region bottomRightRegion;
 	private Region touchTarget;
 	
@@ -32,13 +36,19 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 	public void initialize() {
 		this.flag = 1;
 		this.topLeft = new Point(0 + target.getWidth()/2, target.getHeight()/2);
+		this.topRight = new Point(0 + target.getWidth()/2, canvas.getHeight() - target.getHeight() / 2 - 50);
 		this.bottomRight = new Point(canvas.getWidth() - target.getWidth()/2, canvas.getHeight() - target.getHeight() / 2 - 50);
+		this.bottomLeft = new Point(canvas.getWidth() - target.getWidth()/2, 0 + target.getHeight()/2);
+		
 		this.topLeftRegion = new Region(new Rect(0, 0, target.getWidth(), target.getHeight()));
+		this.topRightRegion = new Region(new Rect(0, canvas.getHeight() - 50 - target.getHeight(), target.getWidth(), canvas.getHeight() - 50));
 		this.bottomRightRegion = new Region(new Rect(canvas.getWidth() - target.getWidth(),
 				canvas.getHeight() - target.getHeight() - 50,
 				canvas.getWidth(),
 				canvas.getHeight() - 50
 				));
+		this.bottomLeftRegion = new Region(new Rect(canvas.getWidth() - target.getWidth(),
+				0, canvas.getWidth(), target.getHeight()));
 
 		target.setPosition(topLeft);
 		
@@ -96,6 +106,7 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 	 */
 	@Override
 	public void update() {
+		/* Set target alternative appearing on topLeft and bottomRight region
 		flag *= -1;
 		if(flag == 1) {
 			target.setPosition(topLeft);
@@ -104,6 +115,34 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 		else {
 			target.setPosition(bottomRight);
 			this.setTouchRegion(bottomRightRegion);
+		}
+		*/
+		
+		// Set target to appear randomly on the touch screen
+		int newFlag = (int)Math.floor(Math.random() * 4);
+		while(flag == newFlag) {
+			newFlag = (int)Math.floor(Math.random() * 4);
+		}
+		
+		flag = newFlag;
+		switch(newFlag) {
+		case 0:
+			target.setPosition(topLeft);
+			this.setTouchRegion(topLeftRegion);
+			break;
+		case 1:
+			target.setPosition(topRight);
+			this.setTouchRegion(topRightRegion);
+			break;
+		case 2:
+			target.setPosition(bottomLeft);
+			this.setTouchRegion(bottomLeftRegion);
+			break;
+		case 3:
+			target.setPosition(bottomRight);
+			this.setTouchRegion(bottomRightRegion);
+			break;
+		default:
 		}
 	}
 	

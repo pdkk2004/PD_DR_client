@@ -12,7 +12,6 @@ public class OdlsDbAdapter {
 	public static final String FIELD_TESTER_ID = "tester_id";
 	public static final String FIELD_TEST_ID = "_id";
 	public static final String FIELD_TYPE = "type";
-	public static final String FIELD_DATE = "date";
 	public static final String FIELD_BEGIN_TIME = "begin_time";
 	public static final String FIELD_END_TIME = "end_time";
 	public static final String FIELD_DURATION = "duration";
@@ -26,7 +25,7 @@ public class OdlsDbAdapter {
 	
 	//Database fields array except FIELD_DATA
 	private static final String[] FIELDS = {FIELD_TESTER_ID, FIELD_TEST_ID, 
-			FIELD_TYPE, FIELD_DATE, FIELD_BEGIN_TIME, FIELD_END_TIME,
+			FIELD_TYPE, FIELD_BEGIN_TIME, FIELD_END_TIME,
 			FIELD_DURATION, FIELD_EXPLANATION, FIELD_SAMPLE_RATE, FIELD_SCALE,
 			FIELD_DATA_1, FIELD_DATA_2};
 	
@@ -57,11 +56,11 @@ public class OdlsDbAdapter {
 	 * test_id for that note, otherwise return a -1 to indicate failure.
 	 */
 	public long createTest(String testerID, Integer testID,
-			Integer type, Long date, Long beginTime, Long endTime, Integer duration, String explaination,
+			Integer type, Long beginTime, Long endTime, Integer duration, String explaination,
 			Integer sampleRate, Integer scale, byte[] data1, byte[] data2) 
 	{
 		ContentValues initialValues = createContentValues(testerID, testID,
-				type, date, beginTime, endTime, duration, explaination, sampleRate, scale,
+				type, beginTime, endTime, duration, explaination, sampleRate, scale,
 				data1, data2);
 
 		return database.insert(DATABASE_TABLE, null, initialValues);
@@ -71,11 +70,11 @@ public class OdlsDbAdapter {
 	 * Update the test
 	 */
 	public boolean updateTest(String testerID, Integer testID,
-			Integer type, Long date, Long beginTime, Long endTime, Integer duration, String explaination,
+			Integer type, Long beginTime, Long endTime, Integer duration, String explaination,
 			Integer sampleRate, Integer scale, byte[] data1, byte[] data2)
 	{
 		ContentValues updateValues = createContentValues(testerID, testID,
-				type, date, beginTime, endTime, duration, explaination, sampleRate, scale,
+				type, beginTime, endTime, duration, explaination, sampleRate, scale,
 				data1, data2);
 
 		return database.update(DATABASE_TABLE, updateValues, FIELD_TEST_ID + "="
@@ -148,7 +147,7 @@ public class OdlsDbAdapter {
 	}
 
 	private ContentValues createContentValues(String testerID, Integer testID,
-			Integer type, Long date, Long beginTime, Long endTime, Integer duration, String explaination,
+			Integer type, Long beginTime, Long endTime, Integer duration, String explaination,
 			Integer sampleRate, Integer scale, byte[] data1, byte[] data2)
 	{
 		ContentValues values = new ContentValues();
@@ -173,12 +172,6 @@ public class OdlsDbAdapter {
 			values.put(FIELD_TYPE, type);
 		}
 		
-		if(date == null) {
-			values.putNull(FIELD_DATE);
-		}
-		else {
-			values.put(FIELD_DATE, date);
-		}
 		
 		if(beginTime == null) {
 			values.putNull(FIELD_BEGIN_TIME);

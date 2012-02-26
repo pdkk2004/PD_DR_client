@@ -54,6 +54,8 @@ public class AssessmentHistoryListActivity extends Activity {
 	private static final int DLG_SEND_IN_PROGRESS = 17;
 	private static final int DLG_SEND_SUCCESS = 200;
 	private static final int DLG_SEND_ERROR = 11;
+	private static final int DLG_SEND_DUP = 302;
+
 	
 	private OdlsDbAdapter databaseManager;
 	private ListView testsListView;
@@ -71,6 +73,7 @@ public class AssessmentHistoryListActivity extends Activity {
 				break;
 			case DLG_SEND_FAIL:showDialog(DLG_SEND_FAIL);
 				break;
+			case DLG_SEND_DUP:showDialog(DLG_SEND_DUP);
 			default:
 				return;
 			}
@@ -200,7 +203,8 @@ public class AssessmentHistoryListActivity extends Activity {
 				ByteArrayBody bab = new ByteArrayBody(fileBytes, file);
 				fileEntity.addPart(User.USER_NAME, new StringBody(test.getTesterID()));
 				fileEntity.addPart("file", bab);
-				return OdlsHttpClientHelper.getHttpPostResponse(url, fileEntity).getStatusLine().getStatusCode();				
+				int code = OdlsHttpClientHelper.getHttpPostResponse(url, fileEntity).getStatusLine().getStatusCode();			
+				return code;
 			}
 		}
 		catch(IOException e) {
@@ -226,7 +230,6 @@ public class AssessmentHistoryListActivity extends Activity {
 	    			+ OdlsDbAdapter.FIELD_TESTER_ID + ", "
 	    			+ OdlsDbAdapter.FIELD_TEST_ID + ", "
 	    			+ OdlsDbAdapter.FIELD_TYPE + ", "
-	    			+ OdlsDbAdapter.FIELD_DATE + ", "
 	    			+ OdlsDbAdapter.FIELD_BEGIN_TIME + ", "
 	    			+ OdlsDbAdapter.FIELD_END_TIME + ", "
 	    			+ OdlsDbAdapter.FIELD_DURATION + ", "
@@ -243,7 +246,6 @@ public class AssessmentHistoryListActivity extends Activity {
 	    			+ OdlsDbAdapter.FIELD_TESTER_ID + ", "
 	    			+ OdlsDbAdapter.FIELD_TEST_ID + ", "
 	    			+ OdlsDbAdapter.FIELD_TYPE + ", "
-	    			+ OdlsDbAdapter.FIELD_DATE + ", "
 	    			+ OdlsDbAdapter.FIELD_BEGIN_TIME + ", "
 	    			+ OdlsDbAdapter.FIELD_END_TIME + ", "
 	    			+ OdlsDbAdapter.FIELD_DURATION + ", "
@@ -351,6 +353,19 @@ public class AssessmentHistoryListActivity extends Activity {
 			builder.setMessage("Application error. Sending file is terminated!");
 			
 			builder.setCancelable(true);
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//TODO: OK button trigered event
+				}
+			});
+			dialog = builder.create();
+			return dialog;
+		case DLG_SEND_DUP:
+			// Create AlterDialog
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("Warning");
+			builder.setMessage("The selected test has already been sent to server.");
+			builder.setCancelable(false);
 			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					//TODO: OK button trigered event

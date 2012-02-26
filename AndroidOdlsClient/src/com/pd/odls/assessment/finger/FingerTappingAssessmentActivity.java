@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.lang.Thread.State;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -487,9 +489,52 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 		byte[] data1 = bufferTime.toByteArray();
 		byte[] data2 = bufferCount.toByteArray();
 		
-		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
+//		//Debug purpose
+//		ArrayList<Long> data1List = new ArrayList<Long>();
+//		try {
+//			boolean EOF = false;
+//			ByteArrayInputStream bis = new ByteArrayInputStream(data1);
+//			DataInputStream dis = new DataInputStream(bis);
+//			while(!EOF) {
+//				data1List.add(dis.readLong());
+//			}
+//		}
+//		catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//		String data1S = Base64.encodeToString(data1, Base64.DEFAULT);
+//		byte[] data11 = Base64.decode(data1S, Base64.DEFAULT);
+//		ArrayList<Long> data11List = new ArrayList<Long>();
+//		try {
+//			boolean EOF = false;
+//			ByteArrayInputStream bis = new ByteArrayInputStream(data11);
+//			DataInputStream dis = new DataInputStream(bis);
+//			while(!EOF) {
+//				data11List.add(dis.readLong());
+//			}
+//		}
+//		catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		//Debug purpose
+//		ArrayList<Boolean> data2List = new ArrayList<Boolean>();
+//		try {
+//			boolean EOF = false;
+//			ByteArrayInputStream bis = new ByteArrayInputStream(data2);
+//			DataInputStream dis = new DataInputStream(bis);
+//			while(!EOF) {
+//				data2List.add(dis.readBoolean());
+//			}
+//		}
+//		catch(IOException e) {
+//			e.printStackTrace();
+//		}
+		
 		int testDuration = (int)(endTime - beginTime);
-		int sampleRate = (int)(1000 * samplePoints / testDuration);
+		int sampleRate = -1;
 		String userId = PreferenceManager.getDefaultSharedPreferences(this).getString(User.USER_NAME, "n/a");
 
 		int testId = (int)databaseManager.createTest(
@@ -497,10 +542,9 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 				null,
 				testType,
 				beginTime,
-				beginTime,
 				endTime,
 				testDuration,
-				"Test record",
+				"Test Record",
 				sampleRate,
 				null,
 				data1,
@@ -514,10 +558,9 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 				testId,
 				testType,
 				beginTime,
-				beginTime,
 				endTime,
 				testDuration,
-				"Test record",
+				"Test Record",
 				sampleRate,
 				null,
 				data1,

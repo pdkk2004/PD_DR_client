@@ -45,7 +45,7 @@ public class AssessmentHistoryListArrayAdapter extends ArrayAdapter<Assessment>{
         Assessment t = getItem(position);
         //bind test date text
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-		String date = sdf.format(t.getDate());
+		String date = sdf.format(t.getBeginTime());
 		sdf = new SimpleDateFormat("HH:mm");
 		String time = sdf.format(t.getBeginTime());
         testDate.setText(date + " @" + time);
