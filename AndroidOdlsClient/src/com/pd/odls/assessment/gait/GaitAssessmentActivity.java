@@ -183,9 +183,6 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 		//initialize DataOutputStream to store sensed data
 		this.doutAcc = new DataOutputStream(bufferAcc);
 		this.doutOri = new DataOutputStream(bufferOri);
-		
-		//set test type
-		this.setTestType(Assessment.TEST_GAIT);
 	}
 	
 	@Override
@@ -345,7 +342,26 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 		
 		switch (id) {
 		case DLG_INSTRUCTION_1:
-			builder.setMessage(Html.fromHtml("Please put device on to one of your ankle using ankle band, " +
+			builder.setMessage(Html.fromHtml("Please select which side of walking are you going to test, Left or Right?</b></front>"))
+					.setCancelable(false)
+					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Assessment.TEST_GAIT_LEFT);
+							dialog.dismiss();
+							showDialog(DLG_INSTRUCTION_2);
+						}
+					})
+					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Assessment.TEST_GAIT_RIGHT);
+							dialog.dismiss();
+							showDialog(DLG_INSTRUCTION_2);
+						}
+					});
+			dialog = builder.create();
+			return dialog;
+		case DLG_INSTRUCTION_2:
+			builder.setMessage(Html.fromHtml("Please put device on your test ankle, " +
 					"then press start button to begin test when you are ready.\n<br />" +
 					"<font color = 'yellow'>Test will begin 5 seconds later after you press start button.\n<br /></font>" + 
 					"<font color='red'>Please begin to walk after feeling a short vibration.</font>"))

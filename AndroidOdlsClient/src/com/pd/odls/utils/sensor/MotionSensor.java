@@ -39,15 +39,17 @@ public class MotionSensor {
         public void onSensorChanged(SensorEvent event) {
         	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             	
-        		//obtain translation acceleration
+        		//obtain gravity
         		mGravity = event.values;
+        		
+    			//deal with acceleration
         		if(accelerationDelegate != null) {
         			accelerationDelegate.onSensedValueChanged(mGravity[0],
         					mGravity[1],
         					mGravity[2]);
         		}
         		
-        		//obtain orientation acceleration
+        		//obtain orientation acceleration and orientation
             	if (mGravity != null && mGeomagnetic != null) {
             		float R[] = new float[9];
             		float I[] = new float[9];
@@ -58,7 +60,9 @@ public class MotionSensor {
             			x = orientation[0]; // orientation azimut
             			y = orientation[1]; // orientation pitch
             			z = orientation[2]; // orientation roll
-                    	if(orientationDelegate != null)
+                    	
+            			//deal with orientation
+            			if(orientationDelegate != null)
                     		orientationDelegate.onSensedValueChanged(x, y, z);
             		}
             	}

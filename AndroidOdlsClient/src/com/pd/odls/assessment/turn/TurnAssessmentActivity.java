@@ -341,31 +341,7 @@ public class TurnAssessmentActivity extends BaseAssessmentActivity {
 		
 		switch (id) {
 		case DLG_INSTRUCTION_1:
-			builder.setMessage("Please bind device on one of your ankle, " +
-					"then press Next to proceed to next step, or press cancel to exit test")
-					.setCancelable(false)
-					.setPositiveButton("Next", new DialogInterface.OnClickListener()  {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							try {
-								Thread.sleep(300);
-							}
-							catch(InterruptedException e) {
-								
-							}
-							showDialog(DLG_INSTRUCTION_2);
-						}
-					})
-					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {						
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							finish();
-						}
-					});
-			dialog = builder.create();
-			return dialog;
-		case DLG_INSTRUCTION_2:
-			builder.setMessage("Please select which direction you want to turn, left or right? ")
+			builder.setMessage("Please select the turnning direction, turn left or right? ")
 					.setCancelable(false)
 					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
 						public void onClick(DialogInterface dialog, int which) {
@@ -378,11 +354,37 @@ public class TurnAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_LEFT_TURN);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_3);
+							showDialog(DLG_INSTRUCTION_2);
 						}
 					});
 			dialog = builder.create();
 			return dialog;
+		case DLG_INSTRUCTION_2:
+			builder.setMessage("If you selected turn right, please bind the device to your right ankle." +
+					"Otherwise, please bind to left ankle, "+
+					"then press Next to proceed to next step, or press cancel to exit test")
+					.setCancelable(false)
+					.setPositiveButton("Next", new DialogInterface.OnClickListener()  {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							try {
+								Thread.sleep(300);
+							}
+							catch(InterruptedException e) {
+								
+							}
+							showDialog(DLG_INSTRUCTION_3);
+						}
+					})
+					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {						
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							finish();
+						}
+					});
+			dialog = builder.create();
+			return dialog;
+
 		case DLG_INSTRUCTION_3:
 			builder.setMessage(Html.fromHtml("Are you ready to begin the test? Please press Start button to begin, "
 					+ "or exit test by pressing <font color = 'yellow'><b>Back</b></font> button on your cell phone\n<br />" + 
