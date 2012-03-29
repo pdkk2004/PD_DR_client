@@ -31,14 +31,17 @@ public class Assessment {
 	public static int TEST_FINGER_TAPPING_RIGHT = 6;
 	public static int TEST_GAIT_LEFT = 7;
 	public static int TEST_GAIT_RIGHT = 8;
+	public static int TEST_FINGER_TOUCHING_LEFT = 9;
+	public static int TEST_FINGER_TOUCHING_RIGHT = 10;
 	
 	public static String TEST_TYPES[] = {"Unknown", "Left Hand Tremor", "Rignt Hand Tremor",
 		"Left Turn", "Right Turn", "Left Finger Tap", "Right Finger Tap",
-		"Left Walk", "Right Walk"};
+		"Left Walk", "Right Walk", "Left Finger Touching", "Right Finger Touching"};
 	
 	public static int TEST_TYPE_MAP[] = {R.drawable.alert_dialog_icon, R.drawable.hand_tremor,
 		R.drawable.hand_tremor, R.drawable.leg_tremor, R.drawable.leg_tremor, 
-		R.drawable.finger_tapping, R.drawable.finger_tapping, R.drawable.gait_difficulty, R.drawable.gait_difficulty};
+		R.drawable.finger_tapping, R.drawable.finger_tapping, R.drawable.gait_difficulty, R.drawable.gait_difficulty,
+		R.drawable.finger_tapping, R.drawable.finger_tapping};
 	
 	//Test information
 	private String testerID;

@@ -348,14 +348,14 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_GAIT_LEFT);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_2);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					})
 					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_GAIT_RIGHT);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_2);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					});
 			dialog = builder.create();

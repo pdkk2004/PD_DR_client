@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.pd.odls.R;
 import com.pd.odls.assessment.finger.FingerTappingAssessmentActivity;
+import com.pd.odls.assessment.fingertouch.FingerTouchingAssessmentActivity;
 import com.pd.odls.assessment.gait.GaitAssessmentActivity;
 import com.pd.odls.assessment.handtremor.HandTremorAssessmentActivity;
 import com.pd.odls.assessment.turn.TurnAssessmentActivity;
@@ -29,10 +30,10 @@ public class AssessmentListActivity extends ListActivity {
 		
 		//set test name array
 		String[] testNames = {"Test hand tremor", "Test walking",
-				"Test finger tapping", "Test turnning"};
+				 "Test turnning", "Test finger tapping 1", "Test finger tapping 2"};
 		
 		int[] testImage = {R.drawable.hand_tremor, R.drawable.gait_difficulty,
-				R.drawable.finger_tapping, R.drawable.leg_tremor};
+				R.drawable.leg_tremor, R.drawable.finger_tapping, R.drawable.finger_tapping};
 		
 		//create the arrayAdapter to display all test names in a ListView
 		this.setListAdapter(new TestTypeItemAdaptor(this, testNames, testImage));
@@ -54,10 +55,13 @@ public class AssessmentListActivity extends ListActivity {
 			i = new Intent(this, GaitAssessmentActivity.class);
 			break;
 		case 2:
-			i = new Intent(this, FingerTappingAssessmentActivity.class);
+			i = new Intent(this, TurnAssessmentActivity.class);
 			break;
 		case 3:
-			i = new Intent(this, TurnAssessmentActivity.class);
+			i = new Intent(this, FingerTappingAssessmentActivity.class);
+			break;			
+		case 4:
+			i = new Intent(this, FingerTouchingAssessmentActivity.class);
 			break;
 		default:
 			return;

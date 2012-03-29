@@ -28,14 +28,21 @@ public class MotionSensor {
     //declare sensorListener to listen to motion sensor events
     private SensorEventListener sensorListener = new SensorEventListener() {
         private float[] mGravity;
-        float[] mGeomagnetic;      
+        float[] mGeomagnetic;   
  
         private float x = 0;
         private float y = 0;
         private float z = 0;
+        
+		private float R[] = new float[9];
+		private float I[] = new float[9];
  
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
  
+        /**
+         * onSensorChanged delegate method to collect linear acceleration and orientation
+         */
+
         public void onSensorChanged(SensorEvent event) {
         	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             	
@@ -51,20 +58,23 @@ public class MotionSensor {
         		
         		//obtain orientation acceleration and orientation
             	if (mGravity != null && mGeomagnetic != null) {
-            		float R[] = new float[9];
-            		float I[] = new float[9];
-            		boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
-            		if (success) {
-            			float orientation[] = new float[3]; 
-            			SensorManager.getOrientation(R, orientation); 
-            			x = orientation[0]; // orientation azimut
-            			y = orientation[1]; // orientation pitch
-            			z = orientation[2]; // orientation roll
-                    	
-            			//deal with orientation
-            			if(orientationDelegate != null)
-                    		orientationDelegate.onSensedValueChanged(x, y, z);
-            		}
+            		SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);           			               		
+            		//float trueacceleration[] = new float[3];
+            		//float accelerometervalues[] = new float[3];
+            		//float orientationvalues[] = new float[3];
+            		//trueacceleration[0] =(float) (accelerometervalues[0]*(Math.cos(orientationvalues[2])*Math.cos(orientationvalues[0])+Math.sin(orientationvalues[2])*Math.sin(orientationvalues[1])*Math.sin(orientationvalues[0])) + accelerometervalues[1]*(Math.cos(orientationvalues[1])*Math.sin(orientationvalues[0])) + accelerometervalues[2]*(-Math.sin(orientationvalues[2])*Math.cos(orientationvalues[0])+Math.cos(orientationvalues[2])*Math.sin(orientationvalues[1])*Math.sin(orientationvalues[0])));
+            		//trueacceleration[1] = (float) (accelerometervalues[0]*(-Math.cos(orientationvalues[2])*Math.sin(orientationvalues[0])+Math.sin(orientationvalues[2])*Math.sin(orientationvalues[1])*Math.cos(orientationvalues[0])) + accelerometervalues[1]*(Math.cos(orientationvalues[1])*Math.cos(orientationvalues[0])) + accelerometervalues[2]*(Math.sin(orientationvalues[2])*Math.sin(orientationvalues[0])+ Math.cos(orientationvalues[2])*Math.sin(orientationvalues[1])*Math.cos(orientationvalues[0])));
+            		//trueacceleration[2] = (float) (accelerometervalues[0]*(Math.sin(orientationvalues[2])*Math.cos(orientationvalues[1])) + accelerometervalues[1]*(-Math.sin(orientationvalues[1])) + accelerometervalues[2]*(Math.cos(orientationvalues[2])*Math.cos(orientationvalues[1])));
+
+        			float orientation[] = new float[3]; 
+        			SensorManager.getOrientation(R, orientation); 
+        			x = orientation[0]; // orientation azimut
+        			y = orientation[1]; // orientation pitch
+        			z = orientation[2]; // orientation roll
+                	
+        			//deal with orientation
+        			if(orientationDelegate != null)
+                		orientationDelegate.onSensedValueChanged(x, y, z);
             	}
         	}        	
         	else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
@@ -74,7 +84,54 @@ public class MotionSensor {
         		
         	}
         }
+        
+        /**
+         * onSensorChanged delegate method to collect linear acceleration in device coordinate system,
+         * and linear acceleration in world coordinate system
+         */
+        /*
+        public void onSensorChanged(SensorEvent event) {
+        	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            	
+        		//obtain gravity
+        		mGravity = event.values;
+        		
+    			//deal with acceleration
+        		if(accelerationDelegate != null) {
+        			accelerationDelegate.onSensedValueChanged(mGravity[0],
+        					mGravity[1],
+        					mGravity[2]);
+        		}
+        		
+        		//update rotation matrix
+            	if (mGravity != null && mGeomagnetic != null) {
+            		float[] rotationMatrix = new float[9];
+            		boolean success = SensorManager.getRotationMatrix(rotationMatrix, I, mGravity, mGeomagnetic);
+            		if (success) {
+            			System.arraycopy(rotationMatrix, 0, R, 0, rotationMatrix.length);
+            		}
+            	}
+            	
+        		//transfer gravity in device coordinate system to world coordinate system
+            	float X = R[0] * mGravity[0] + R[1] * mGravity[1] + R[2] * mGravity[2];
+            	float Y = R[3] * mGravity[0] + R[4] * mGravity[1] + R[5] * mGravity[2];
+            	float Z = R[6] * mGravity[0] + R[7] * mGravity[1] + R[8] * mGravity[2];
+            	
+        		//deal with acceleration in world coordinate system
+        		if(orientationDelegate != null)
+        			orientationDelegate.onSensedValueChanged(X, Y, Z);   
+        		
+        	}        	
+        	else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+        		mGeomagnetic = event.values;
+        	}
+        	else {
+        		
+        	}
+        }   
+         */     
     };
+
          
     public MotionSensor(Context context) {
 		super();

@@ -9,7 +9,7 @@ package com.pd.odls.utils.sensor;
  */
 public interface SensorDelegate {
 	
-	public void onSensedValueChanged(float x, float y, float z);
+	public void onSensedValueChanged(float d, float e, float f);
 	 
 	public void onShake(float force);
 

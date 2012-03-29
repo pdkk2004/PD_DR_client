@@ -63,7 +63,7 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 	//bufferTime store the time in long format, following the pattern: target appearing time, target hit time, ...repetative
 	private ByteArrayOutputStream bufferTime = new ByteArrayOutputStream();
 	private DataOutputStream doutTime;
-	//bufferCount store the result of user's attempt to touch target, saved in boolen format.
+	//bufferCount store the result of user's attempt to touch target, saved in boolean format.
 	private ByteArrayOutputStream bufferCount = new ByteArrayOutputStream();
 	private DataOutputStream doutCount;
 
@@ -118,7 +118,7 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 		
 		//create the moving objects for test panel
 		MovingObject mo = new MovingObject(BitmapFactory.decodeResource(
-				getResources(), R.drawable.target_80));
+				getResources(), R.drawable.target_red_80));
 		
 		//create the test panel
 		testPanel = new FingerTappingAssessmentPanel(this, mo);
@@ -350,14 +350,14 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_FINGER_TAPPING_LEFT);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_2);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					})
 					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_FINGER_TAPPING_RIGHT);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_2);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					});
 			dialog = builder.create();

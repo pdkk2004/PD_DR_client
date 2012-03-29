@@ -347,14 +347,14 @@ public class TurnAssessmentActivity extends BaseAssessmentActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_LEFT_TURN);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_3);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					})
 					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
 							setTestType(Assessment.TEST_LEFT_TURN);
 							dialog.dismiss();
-							showDialog(DLG_INSTRUCTION_2);
+							//showDialog(DLG_INSTRUCTION_2);
 						}
 					});
 			dialog = builder.create();

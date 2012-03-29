@@ -1,4 +1,4 @@
-package com.pd.odls.assessment.handtremor;
+package com.pd.odls.assessment.fingertouch;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -14,11 +14,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,7 +22,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -38,42 +32,41 @@ import android.widget.TextView;
 
 import com.pd.odls.R;
 import com.pd.odls.assessment.BaseAssessmentActivity;
-import com.pd.odls.assessment.DrawPattern;
-import com.pd.odls.assessment.MotionSensingThread;
 import com.pd.odls.assessment.MovingObject;
 import com.pd.odls.domain.model.Assessment;
 import com.pd.odls.domain.model.User;
 import com.pd.odls.util.SupportingUtils;
 import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
-public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
+public class FingerTouchingAssessmentActivity extends BaseAssessmentActivity {
+	private static final String TAG = FingerTouchingAssessmentActivity.class.getSimpleName();
 	
 	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
+	private static final int DLG_BUFFER_FULL = 20;
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
 	
-	//Declare UI components
+	//UI components
 	private Button controlBtn;
 	private TextView elapsedTimeView;
 	protected ProgressDialog countDownDlg;
 
-	//Declare the timer task to count test elapsed time
+
+	//Create the timer task to count test elapsed time
 	private TimerTask timerTask;	
 	private Timer timer;
 	private int elapsedTime;
 	
-	//Declare the timer task to count down time before test begin
+	//Create the timer task to count down time before test begin
 	private CountDownTimerTask countDownTask;
 	
-	//Declare buffer and iostream for collected motion data
-	private ByteArrayOutputStream bufferAcc = new ByteArrayOutputStream();  //create the buffer to store acceleration data
-	private ByteArrayOutputStream bufferOri = new ByteArrayOutputStream();  //create the buffer to store orientation data
+	private ByteArrayOutputStream bufferTime = new ByteArrayOutputStream();  //create the buffer to store acceleration data
+	private ByteArrayOutputStream bufferCount = new ByteArrayOutputStream();  //create the buffer to store orientation data
+
+	private DataOutputStream doutTime;
+	private DataOutputStream doutCount;
 	
-	private DataOutputStream doutAcc;
-	private DataOutputStream doutOri;
-	
-	//Declare Database adapter
 	private OdlsDbAdapter databaseManager;
 	
 	private int testType;
@@ -99,16 +92,14 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 				stopTest();
 				timer.cancel();
 				controlBtn.setText("Start");
-				showDialog(HandTremorAssessmentActivity.DLG_TEST_DONE);
+				showDialog(FingerTouchingAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
-					System.out.println("Count time -1");
-					HandTremorAssessmentActivity.this.countDownDlg.setMessage(
+					FingerTouchingAssessmentActivity.this.countDownDlg.setMessage(
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
 				}
 				else {
-					System.out.println("Ready to begin");
 					countDownDlg.dismiss();
 					beginTest();
 				}
@@ -120,22 +111,42 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		showDialog(DLG_INSTRUCTION_2);
+		showDialog(DLG_INSTRUCTION_1);
 		
 		//create the moving objects for test panel
 		MovingObject mo = new MovingObject(BitmapFactory.decodeResource(
-				getResources(), R.drawable.red_point));
+				getResources(), R.drawable.target_red_80));
 		
 		//create the test panel 
-		testPanel = new HandTremorAssessmentPanel(this, mo);
+		testPanel = new FingerTouchingAssessmentPanel(this, mo);
 		testPanel.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View view, MotionEvent event) {
-				if(event.getAction() == MotionEvent.ACTION_DOWN) {
-					pauseOrResume();
-					return true;
+				if(isRunning && ((FingerTouchingAssessmentPanel)testPanel).
+						hitTouchTarget((int)event.getX(), (int)event.getY())) {
+					try {
+						Log.i(TAG, "Touch target at:" + (int)event.getX() + " " + (int)event.getY());
+						doutCount.writeBoolean(true);
+						doutTime.writeLong(System.currentTimeMillis());
+					}
+					catch(IOException e) {
+						e.printStackTrace();
+					}
 				}
-				return false;
-			}		
+				else if(isRunning) {
+					try {
+						Log.i(TAG, "Touch target at:" + (int)event.getX() + " " + (int)event.getY());
+						doutCount.writeBoolean(false);
+						doutTime.writeLong(System.currentTimeMillis());
+					}
+					catch(IOException e) {
+						e.printStackTrace();
+					}
+				}
+				else {
+					//Do nothing. 
+				}
+				return true;
+			}
 		});
 		
 		//build the test view at run time
@@ -162,7 +173,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 				if(isRunning == false) {
 					initializeTest();
 					Timer t = new Timer();
-					countDownDlg = ProgressDialog.show(HandTremorAssessmentActivity.this, "Ready... Test will begin in", 
+					countDownDlg = ProgressDialog.show(FingerTouchingAssessmentActivity.this, "Ready... Test will begin in", 
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
 					t.schedule(countDownTask, 1000, 1000);
 					controlBtn.setText("Stop");		
@@ -182,8 +193,8 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 		databaseManager = new OdlsDbAdapter(this);
 		
 		//initialize DataOutputStream to store sensed data
-		this.doutAcc = new DataOutputStream(bufferAcc);
-		this.doutOri = new DataOutputStream(bufferOri);
+		this.doutTime = new DataOutputStream(bufferTime);
+		this.doutCount = new DataOutputStream(bufferCount);
 	}
 	
 	@Override
@@ -219,56 +230,56 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 	@Override
 	protected void initializeTest() {
 		//Reset buffer to empty
-		bufferAcc.reset();
-		bufferOri.reset();
+		bufferTime.reset();
+		bufferCount.reset();
 		
-		//Reset isRunning and pause flags to false
+		//Reset isRunning to false
 		isRunning = false;
 		pause = false;
 		
-		//initialize test thread
+		//initialize test thread		
 		if(testThread == null || testThread.getState() == State.TERMINATED) {
-			testThread = new HandTremorAssessmentThread(testPanel, 
+			testThread = new FingerTouchingAssessmentThread(testPanel, 
 					testPanel.getHolder(), 
-					doutAcc,
-					doutOri,
 					this, 
-					handler);
-			
-			//set DrawMotionTrace interface for test thread, which decouple the DrawMotionTrace with testThread.
-			((MotionSensingThread)testThread).setDrawMotionTrace(new DrawPattern() {
-				
-				public void draw(Canvas canvas) {
-					SurfaceHolder surfaceHolder = testPanel.getHolder();
-					try {
-						canvas = surfaceHolder.lockCanvas();
-						synchronized (surfaceHolder) {
-							//add moving object position to motion trace, which is stored in ArrayList tracePoints
-							canvas.drawColor(Color.WHITE);
-							
-							Paint paint = new Paint();
-							paint.setColor(Color.BLUE);
-							paint.setStrokeWidth(2);
-							paint.setStyle(Paint.Style.STROKE);
-
-							Point[] pts = ((MotionSensingThread)testThread).getTracePoints().
-									toArray(new Point[((MotionSensingThread)testThread).getTracePoints().size()]);
-							Path path = new Path();
-							path.moveTo(pts[0].x, pts[0].y);
-							for (int i = 1; i < pts.length; i++){
-								path.lineTo(pts[i].x, pts[i].y);
-							}
-							canvas.drawPath(path, paint);
-						}
-					}
-					finally {
-						if(canvas != null)
-							surfaceHolder.unlockCanvasAndPost(canvas);
-					}						
-				}				
-			});
-			
+					handler);	
 		}
+		
+		//set DrawMotionTrace interface for test thread, which decouple the DrawMotionTrace with testThread.
+		
+		/*
+		((MotionSensingThread)testThread).setDrawMotionTrace(new DrawPattern() {
+			
+			public void draw(Canvas canvas) {
+				SurfaceHolder surfaceHolder = testPanel.getHolder();
+				try {
+					canvas = surfaceHolder.lockCanvas();
+					synchronized (surfaceHolder) {
+						//add moving object position to motion trace, which is stored in ArrayList tracePoints
+						canvas.drawColor(Color.WHITE);
+						
+						Paint paint = new Paint();
+						paint.setColor(Color.BLUE);
+						paint.setStrokeWidth(2);
+						paint.setStyle(Paint.Style.STROKE);
+
+						Point[] pts = ((MotionSensingThread)testThread).getTracePoints().
+								toArray(new Point[((MotionSensingThread)testThread).getTracePoints().size()]);
+						Path path = new Path();
+						path.moveTo(pts[0].x, pts[0].y);
+						for (int i = 1; i < pts.length; i++){
+							path.lineTo(pts[i].x, pts[i].y);
+						}
+						canvas.drawPath(path, paint);
+					}
+				}
+				finally {
+					if(canvas != null)
+						surfaceHolder.unlockCanvasAndPost(canvas);
+				}						
+			}				
+		});
+		*/
 		
 		//initialize count down timer task before task beginning
 		this.setCountDownTask(new CountDownTimerTask(3, handler));
@@ -282,7 +293,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
-				if(elapsedTime > 15) {
+				if(elapsedTime > 10) {
 					handler.sendEmptyMessage(MSG_TIME_END);
 				}
 				synchronized(this) {
@@ -297,7 +308,6 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 				}
 			}			
 		};
-		
 		timer = new Timer();
 		elapsedTime = 0;	
 	}	
@@ -307,7 +317,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 	@Override
 	protected void beginTest() {
 		//Vibrate for 500 milliseconds to indicate test begin
-		long[] pattern = {0, 500};
+		long[] pattern = {0, 1000};
 		SupportingUtils.vibrate(this, pattern);
 		try {
 			Thread.sleep(1000);
@@ -345,7 +355,27 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 		
 		switch (id) {
 		case DLG_INSTRUCTION_1:
-			builder.setMessage("Please bind device on your wrist, " +
+			builder.setMessage("Please select which side of hand you want to test, left or right? ")
+					.setCancelable(false)
+					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Assessment.TEST_FINGER_TOUCHING_LEFT);
+							dialog.dismiss();
+							//showDialog(DLG_INSTRUCTION_2);
+						}
+					})
+					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							setTestType(Assessment.TEST_FINGER_TOUCHING_RIGHT);
+							dialog.dismiss();
+							//showDialog(DLG_INSTRUCTION_2);
+						}
+					});
+			dialog = builder.create();
+			return dialog;
+		case DLG_INSTRUCTION_2:
+			builder.setMessage("If you selected turn right, please bind the device to your right ankle." +
+					"Otherwise, please bind to left ankle, "+
 					"then press Next to proceed to next step, or press cancel to exit test")
 					.setCancelable(false)
 					.setPositiveButton("Next", new DialogInterface.OnClickListener()  {
@@ -357,7 +387,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 							catch(InterruptedException e) {
 								
 							}
-							showDialog(DLG_INSTRUCTION_2);
+							showDialog(DLG_INSTRUCTION_3);
 						}
 					})
 					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {						
@@ -368,25 +398,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 					});
 			dialog = builder.create();
 			return dialog;
-		case DLG_INSTRUCTION_2:
-			builder.setMessage("Please select which hand are you going to test, Left or Right?")
-					.setCancelable(false)
-					.setPositiveButton("Left", new DialogInterface.OnClickListener()  {
-						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Assessment.TEST_HAND_TREMOR_LEFT);
-							dialog.dismiss();
-							//showDialog(DLG_INSTRUCTION_3);
-						}
-					})
-					.setNegativeButton("Right", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							setTestType(Assessment.TEST_HAND_TREMOR_RIGHT);
-							dialog.dismiss();
-							//showDialog(DLG_INSTRUCTION_3);
-						}
-					});
-			dialog = builder.create();
-			return dialog;
+
 		case DLG_INSTRUCTION_3:
 			builder.setMessage(Html.fromHtml("Are you ready to begin the test? Please press Start button to begin, "
 					+ "or exit test by pressing <font color = 'yellow'><b>Back</b></font> button on your cell phone\n<br />" + 
@@ -442,8 +454,6 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							bufferAcc.reset();
-							bufferOri.reset();
 							leave();
 						}
 					});
@@ -461,7 +471,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 					stopTest();
 					timer.cancel();
 					controlBtn.setText("Start");
-					HandTremorAssessmentActivity.this.leave();
+					FingerTouchingAssessmentActivity.this.leave();
 				}
 			})
 			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -492,15 +502,15 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 		}
 		
 		try {
-			doutAcc.close();
-			doutOri.close();
+			doutTime.close();
+			doutCount.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		byte[] data1 = bufferAcc.toByteArray();
-		byte[] data2 = bufferOri.toByteArray();
+		byte[] data1 = bufferTime.toByteArray();
+		byte[] data2 = bufferCount.toByteArray();
 		
 		int samplePoints = data1.length / SupportingUtils.BYTES_PER_SAMPLING / 3;
 		int testDuration = (int)(endTime - beginTime);
@@ -547,11 +557,10 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 
 		
 		//clear buffer for next use
-		bufferAcc.reset();
-		bufferOri.reset();
+		bufferTime.reset();
+		bufferCount.reset();
 		return true;
 	}
-
 	public TimerTask getCountDownTask() {
 		return countDownTask;
 	}
@@ -604,7 +613,7 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 	}
 	
 	/*
-	 * Release resource, close database and then call finish() to go back to parent view.
+	 * Force leave current test
 	 */
 	public void leave() {
 		testThread = null;
@@ -615,8 +624,8 @@ public class HandTremorAssessmentActivity extends BaseAssessmentActivity {
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
-		this.bufferAcc.reset();
-		this.bufferOri.reset();
+		this.bufferTime.reset();
+		this.bufferCount.reset();
 		super.finish();
 	}
 	

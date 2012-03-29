@@ -25,7 +25,9 @@
 		<activity android:name=".assessment.gait.GaitAssessmentActivity"
 		    android:screenOrientation="portrait" />
 		<activity android:name=".assessment.finger.FingerTappingAssessmentActivity"
-		    android:screenOrientation="landscape"/>	
+		    android:screenOrientation="landscape"/>
+		<activity android:name=".assessment.fingertouch.FingerTouchingAssessmentActivity"
+		    android:screenOrientation="portrait" />
 		<activity android:name=".main.Preferences" android:label="Preferences"></activity>
 	</application>
 	<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
