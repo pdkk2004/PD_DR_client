@@ -54,6 +54,7 @@ public class TurnAssessmentActivity extends BaseAssessmentActivity {
 	private static final int DLG_DATABASE_ERROR = 27;
 	private static final int DLG_TEST_DONE = 30;
 	
+	
 	//UI components
 	private Button controlBtn;
 	private TextView elapsedTimeView;

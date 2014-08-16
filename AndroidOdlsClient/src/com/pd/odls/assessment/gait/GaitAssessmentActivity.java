@@ -269,7 +269,7 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 		});
 		
 		//initialize count down timer task before task beginning, initialize 5 seconds.
-		this.setCountDownTask(new CountDownTimerTask(5, handler));
+		this.setCountDownTask(new CountDownTimerTask(2, handler));
 		
 		//initialize test drawing panel to reset drawing
 		testPanel.initialize();

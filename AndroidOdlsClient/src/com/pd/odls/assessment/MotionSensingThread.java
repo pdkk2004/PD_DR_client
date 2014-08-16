@@ -16,6 +16,7 @@ import android.view.SurfaceHolder;
 
 import com.pd.odls.utils.sensor.MotionSensor;
 import com.pd.odls.utils.sensor.SensorDelegate;
+import com.pd.odls.utils.sensor.SimulatedMotionSensor;
 
 public class MotionSensingThread extends BaseAssessmentThread {
 	
@@ -34,8 +35,8 @@ public class MotionSensingThread extends BaseAssessmentThread {
 //	private SimulatedAccelerometer accelerometer;   //do not need any more
 	
 	//TODO change SimulatedAccelerometer to Accelerometer in production
-	private MotionSensor motionSensor;
-//	private SimulatedMotionSensor motionSensor;
+//	private MotionSensor motionSensor;
+	private SimulatedMotionSensor motionSensor;
 	
 	private DataOutputStream doutAcc;
 	private DataOutputStream doutOri;
@@ -72,8 +73,8 @@ public class MotionSensingThread extends BaseAssessmentThread {
 	public void initializeSensor() {
 		if(context != null) {
 			//TODO change SimulatedOrientation to Orientation in production			
-			motionSensor = new MotionSensor(this.context);	
-//			motionSensor = new SimulatedMotionSensor(this.context);
+//			motionSensor = new MotionSensor(this.context);	
+			motionSensor = new SimulatedMotionSensor(this.context);
 		
 			motionSensor.setAccDelegate(delegateAcc);
 			motionSensor.setOriDelegate(delegateOri);

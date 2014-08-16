@@ -280,7 +280,7 @@ public class FingerTappingAssessmentActivity extends BaseAssessmentActivity {
 			public void run() {
 				handler.sendEmptyMessage(MSG_TEST_TIME_CHANGE);
 				elapsedTime += 1;
-				if(elapsedTime > 15) {
+				if(elapsedTime > 10) {
 					handler.sendEmptyMessage(MSG_TIME_END);
 				}
 				synchronized(this) {

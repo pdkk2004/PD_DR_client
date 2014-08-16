@@ -58,7 +58,7 @@ public class MainControlActivity extends TabActivity {
 		
 		//default server_root on local machine
 //		String serve_root = "http://10.0.2.2:8080";
-		String server_root = "http://192.168.1.101:8080";
+		String server_root = "http://192.168.1.103:8080";
 		edit.putString("server.root", server_root);
 		edit.putString("server.login", server_root + "/Odls/login");
 		edit.putString("server.send", server_root + "/Odls/send");
