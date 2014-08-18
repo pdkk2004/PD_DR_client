@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.pd.odls" android:versionCode="1" android:versionName="1.0">
+	
+	<uses-sdk android:minSdkVersion="8"
+	    android:targetSdkVersion="8" 
+	    android:maxSdkVersion="19"/>
+
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
-	    
 	    <activity android:name=".main.MainControlActivity" 
 	        android:screenOrientation="portrait"/>
 		<activity android:name=".view.login.LoginActivity" android:label="@string/app_name"
@@ -22,7 +26,7 @@
 			android:screenOrientation="portrait" />
 		<activity android:name=".assessment.turn.TurnAssessmentActivity"
 		  	android:screenOrientation="portrait" />
-		<activity android:name=".assessment.gait.GaitAssessmentActivity"
+		<activity android:name=".assessment.gait.WalkingAssessmentActivity"
 		    android:screenOrientation="portrait" />
 		<activity android:name=".assessment.finger.FingerTappingAssessmentActivity"
 		    android:screenOrientation="landscape"/>	

@@ -14,8 +14,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.pd.odls.utils.sensor.MotionSensor;
 import com.pd.odls.utils.sensor.SensorDelegate;
+import com.pd.odls.utils.sensor.SimulatedMotionSensor;
 
 public class MotionSensingThread extends BaseAssessmentThread {
 	
@@ -28,14 +28,8 @@ public class MotionSensingThread extends BaseAssessmentThread {
 	private ArrayList<Point> tracePoints = new ArrayList<Point>();
 	
 	private DrawPattern drawMotionTrace;
-	
-	//TODO delete following two lines for running on device
-//	private Accelerometer accelerometer;     //do not need any more
-//	private SimulatedAccelerometer accelerometer;   //do not need any more
-	
-	//TODO change SimulatedAccelerometer to Accelerometer in production
-	private MotionSensor motionSensor;
-//	private SimulatedMotionSensor motionSensor;
+		
+	private SimulatedMotionSensor motionSensor;
 	
 	private DataOutputStream doutAcc;
 	private DataOutputStream doutOri;
@@ -57,26 +51,14 @@ public class MotionSensingThread extends BaseAssessmentThread {
 	}
 	
 	
-	//TODO Do not need any more, can delete
-//	@Override
-//	public void initializeAccelerometer() {
-//		if(context != null) {
-//			//TODO change SimulatedAccelerometer to Accelerometer in production			
-//			accelerometer = new Accelerometer(this.context);			
-//			accelerometer = new SimulatedAccelerometer(this.context);
-//			
-//			accelerometer.setDelegate(delegateAcc);
-//		}
-//	}
-	
-	public void initializeSensor() {
+	public boolean initializeSensor() {
 		if(context != null) {
-			//TODO change SimulatedOrientation to Orientation in production			
-			motionSensor = new MotionSensor(this.context);	
-//			motionSensor = new SimulatedMotionSensor(this.context);
-		
+			motionSensor = new SimulatedMotionSensor(this.context);
 			motionSensor.setAccDelegate(delegateAcc);
 			motionSensor.setOriDelegate(delegateOri);
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -175,43 +157,18 @@ public class MotionSensingThread extends BaseAssessmentThread {
 	@Override
 	public void setRunning(boolean running) {
 		super.setRunning(running);
-//		if(accelerometer == null)
-//			initializeAccelerometer();
-		if(motionSensor == null)
-			initializeSensor();
-		
-//		if(accelerometer != null) {
-//			if(isRunning) {
-//				accelerometer.start();
-//			}
-//			else {
-//				accelerometer.stop();
-//			}
-//		}
-		
-		if(motionSensor != null) {
-			if(isRunning) {
+		if (motionSensor != null || initializeSensor()) {
+			if (isRunning) {
 				motionSensor.start();
-			}
-			else {
+			} else {
 				motionSensor.stop();
 			}
 		}
-		
 	}
 
 	@Override
 	public void changePauseStatus() {
 		super.changePauseStatus();
-//		if(accelerometer != null) {
-//			if(!paused) {
-//				accelerometer.start();
-//			}
-//			else {
-//				accelerometer.stop();
-//			}
-//		}
-		
 		if(motionSensor != null) {
 			if(!paused) {
 				motionSensor.start();

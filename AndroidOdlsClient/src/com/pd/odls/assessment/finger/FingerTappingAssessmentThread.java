@@ -95,8 +95,9 @@ public class FingerTappingAssessmentThread extends BaseAssessmentThread {
 
 
 	@Override
-	public void initializeSensor() {
-		// TODO Leave blank do not need Accelerometer		
+	public boolean initializeSensor() {
+		// TODO Leave blank do not need Accelerometer
+		return false;
 	}
 	
 }

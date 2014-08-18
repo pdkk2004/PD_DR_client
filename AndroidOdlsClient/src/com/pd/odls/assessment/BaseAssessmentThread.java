@@ -84,5 +84,5 @@ public abstract class BaseAssessmentThread extends Thread {
 	/**
 	 * Set up Accelerometer associated with this thread
 	 */
-	public abstract void initializeSensor();
+	public abstract boolean initializeSensor();
 }

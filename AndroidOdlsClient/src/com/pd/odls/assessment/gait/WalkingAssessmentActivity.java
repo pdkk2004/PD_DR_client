@@ -48,7 +48,7 @@ import com.pd.odls.domain.model.User;
 import com.pd.odls.util.SupportingUtils;
 import com.pd.odls.utils.sqlite.OdlsDbAdapter;
 
-public class GaitAssessmentActivity extends BaseAssessmentActivity {
+public class WalkingAssessmentActivity extends BaseAssessmentActivity {
 	
 	public static final int MSG_TIME_END = 25;
 	public static final int MSG_COUNT_DOWN = 24;
@@ -100,11 +100,11 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 				stopTest();
 				timer.cancel();
 				controlBtn.setText("Start");
-				showDialog(GaitAssessmentActivity.DLG_TEST_DONE);
+				showDialog(WalkingAssessmentActivity.DLG_TEST_DONE);
 				break;
 			case MSG_COUNT_DOWN:
 				if(msg.arg1 > 0) {
-					GaitAssessmentActivity.this.countDownDlg.setMessage(
+					WalkingAssessmentActivity.this.countDownDlg.setMessage(
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(msg.arg1) + "s" + "</font></big>"));
 				}
 				else {
@@ -161,7 +161,7 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 				if(isRunning == false) {
 					initializeTest();
 					Timer t = new Timer();
-					countDownDlg = ProgressDialog.show(GaitAssessmentActivity.this, "Ready... Test will begin in", 
+					countDownDlg = ProgressDialog.show(WalkingAssessmentActivity.this, "Ready... Test will begin in", 
 							Html.fromHtml("<big><font color='red'>" + String.valueOf(countDownTask.getDuration()) + "s" + "</font></big>"));
 					t.schedule(countDownTask, 1000, 1000);
 					controlBtn.setText("Stop");		
@@ -439,7 +439,7 @@ public class GaitAssessmentActivity extends BaseAssessmentActivity {
 					stopTest();
 					timer.cancel();
 					controlBtn.setText("Start");
-					GaitAssessmentActivity.this.leave();
+					WalkingAssessmentActivity.this.leave();
 				}
 			})
 			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

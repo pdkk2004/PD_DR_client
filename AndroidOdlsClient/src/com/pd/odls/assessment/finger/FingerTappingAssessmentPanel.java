@@ -15,7 +15,6 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 
 	private static final String TAG = FingerTappingAssessmentPanel.class.getSimpleName();
 
-	private MovingObject target;
 	private Point topLeft;
 	private Point bottomRight;
 	private int flag;
@@ -37,15 +36,15 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 		this.flag = 1;
 		this.topLeft = new Point(0 + target.getWidth()/2, target.getHeight()/2);
 //		this.topRight = new Point(0 + target.getWidth()/2, canvas.getHeight() - target.getHeight() / 2 - 50);
-		this.bottomRight = new Point(canvas.getWidth() - target.getWidth()/2, canvas.getHeight() - target.getHeight() / 2 - 50);
+		this.bottomRight = new Point(getWidth() - target.getWidth()/2, getHeight() - target.getHeight() / 2 - 50);
 //		this.bottomLeft = new Point(canvas.getWidth() - target.getWidth()/2, 0 + target.getHeight()/2);
 		
 		this.topLeftRegion = new Region(new Rect(0, 0, target.getWidth(), target.getHeight()));
 //		this.topRightRegion = new Region(new Rect(0, canvas.getHeight() - 50 - target.getHeight(), target.getWidth(), canvas.getHeight() - 50));
-		this.bottomRightRegion = new Region(new Rect(canvas.getWidth() - target.getWidth(),
-				canvas.getHeight() - target.getHeight() - 50,
-				canvas.getWidth(),
-				canvas.getHeight() - 50
+		this.bottomRightRegion = new Region(new Rect(getWidth() - target.getWidth(),
+				getHeight() - target.getHeight() - 50,
+				getWidth(),
+				getHeight() - 50
 				));
 //		this.bottomLeftRegion = new Region(new Rect(canvas.getWidth() - target.getWidth(),
 //				0, canvas.getWidth(), target.getHeight()));
@@ -75,14 +74,6 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 		}
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		canvas.drawColor(Color.WHITE);
-//		if(target != null ) 
-//			target.draw(canvas);
-	}	
-	
-	
 	public void resetPanel() {
 		Point p = new Point();
 		p.set(0, 50);
@@ -97,7 +88,7 @@ public class FingerTappingAssessmentPanel extends BaseAssessmentPanel {
 
 	@Override
 	public Point update(int x, int y, int z) {
-		return target.changePosition(x, y, canvas.getWidth()/2, canvas.getHeight() * 6/7/2);
+		return target.changePosition(x, y, getWidth()/2, getHeight() * 6/7/2);
 	}
 	
 	/**

@@ -26,7 +26,10 @@ public class SimulatedMotionSensor {
     private boolean running;
     private String elapsedTime;
     
-    private SensorEventListener sensorListener = new SensorEventListener() { 
+    private SensorEventListener sensorListener = new AcceleratorEventListener();
+    
+    private class AcceleratorEventListener implements SensorEventListener
+    { 
  
         private float[] mGravity;
         float[] mGeomagnetic;    
@@ -73,7 +76,7 @@ public class SimulatedMotionSensor {
         		
         	}
         }
-    };
+    }
          
     public SimulatedMotionSensor(Context context) {
 		super();

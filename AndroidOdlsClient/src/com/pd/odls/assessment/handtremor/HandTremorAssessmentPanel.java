@@ -12,20 +12,12 @@ import com.pd.odls.assessment.MovingObject;
 public class HandTremorAssessmentPanel extends BaseAssessmentPanel {
 
 	private static final String TAG = HandTremorAssessmentPanel.class.getSimpleName();
-
-	private MovingObject target;
 	
 	public HandTremorAssessmentPanel(Context context, MovingObject o) {
 		super(context);
 		this.target = o;
 	}
 	
-	@Override
-	public void initialize() {
-		Point position = new Point(canvas.getWidth()/2, (canvas.getHeight() - 50) * 6/7/2 );
-		target.setPosition(position);
-	}
-
 	public MovingObject getTarget() {
 		return target;
 	}
@@ -43,17 +35,9 @@ public class HandTremorAssessmentPanel extends BaseAssessmentPanel {
 		}
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		canvas.drawColor(Color.WHITE);
-//		if(target != null ) 
-//			target.draw(canvas);
-	}	
-	
-	
 	public void resetPanel() {
 		Point p = new Point();
-		p.set(canvas.getWidth()/2, canvas.getHeight()/2);
+		p.set(getWidth()/2, getHeight()/2);
 		setTargetPosition(p);
 	}
 	
@@ -65,11 +49,11 @@ public class HandTremorAssessmentPanel extends BaseAssessmentPanel {
 
 	@Override
 	public Point update(int x, int y, int z) {
-		return target.changePosition(x, y, canvas.getWidth()/2, (canvas.getHeight() - 50) * 6/7/2);
+		return target.changePosition(x, y, getWidth()/2, (getHeight() - 50) * 6/7/2);
 	}
 	
 	@Override
 	public void update() {
-		target.changePosition(2, 2, canvas.getWidth()/2, (canvas.getHeight() - 50) * 6/7/2);
+		target.changePosition(2, 2, getWidth()/2, (getHeight() - 50) * 6/7/2);
 	}	
 }
